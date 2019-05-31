@@ -1,24 +1,31 @@
 <template>
   <div class="container">
-      <h1>Me comes la patata</h1>
-    <p>Y si no te apetece, me da igual. Te la vas a comer de todas formas.</p>
-    <div class="large-12 medium-12 small-12 cell">
-      <!--<label>File
-        <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
-      </label>-->
-      <b-form-file
-      v-model="file"
-      :state="Boolean(file)"
-      placeholder="Choose a file..."
-      drop-placeholder="Drop file here..."
-      accept=".pdf, .epub"
-      name="book"
-    ></b-form-file>
-    <div class="mt-3" v-on:change="handleFileUpload()">Selected file: {{ file ? file.name : '' }}</div>
-      <b-button variant="success" v-on:click="submitFile()">Upload</b-button>
+    <div>
+      <div class="row">
+        <div class="col-md-9 m-auto">
+          <h1 class="text-center display-4 my-4">Mongo File Uploads</h1>
+          <b-form-file v-model="file" :state="Boolean(file)"
+            placeholder="Choose a file..."
+            drop-placeholder="Drop file here..."
+            accept=".pdf, .epub"
+            name="book" class="mb-2"></b-form-file>
+
+          <b-button block class="mr-2" variant="success" v-on:click="submitFile()">Upload File</b-button>
+      </div>
+       <div class="text-center col-md-9" style="margin: 50px auto 0;">
+        <b-spinner 
+          class="center" 
+          style="width: 3rem; height: 3rem;" 
+          variant="warning" 
+          label="Text Centered"
+          v-if="buttonsLoading"
+        ></b-spinner>
+      </div>
+      </div>
     </div>
   </div>
 </template>
+
 
 <script>
     import axios from 'axios';
@@ -28,7 +35,8 @@
     */
     data(){
       return {
-        file: ''
+        file: '',
+        buttonsLoading: false
       }
     },
 
@@ -40,6 +48,7 @@
         /*
                 Initialize the form data
             */
+        this.buttonsLoading = true;
            console.log(this.file);
             let formData = new FormData();
 
@@ -54,6 +63,7 @@
               }
             ).then(function(){
           console.log('SUCCESS!!');
+          buttonsLoading = false;
         })
         .catch(function(){
           console.log('FAILURE!!');
@@ -67,4 +77,3 @@
     }
   }
 </script>
-
