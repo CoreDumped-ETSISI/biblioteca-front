@@ -23,6 +23,7 @@
       </div>
       </div>
     </div>
+    <b-button variant="success" v-on:click="changePage()">Change</b-button>
   </div>
 </template>
 
@@ -41,13 +42,15 @@
     },
 
     methods: {
-      /*
-        Submits the file to the server
-      */
+      changePage(){
+        console.log("Hey")
+        this.$router.push({
+            path: '/'
+        })
+      },
+
       submitFile(){
-        /*
-                Initialize the form data
-            */
+
         this.buttonsLoading = true;
            console.log(this.file);
             let formData = new FormData();
@@ -62,9 +65,11 @@
                 }
               }
             ).then(function(){
-          console.log('SUCCESS!!');
-          buttonsLoading = false;
-        })
+              buttonsLoading = false;
+              console.log('1'+this.$router);
+              this.$router.push('http://localhost:3000/fillBook');
+              console.log('SUCCESS!!');
+          })
         .catch(function(){
           console.log('FAILURE!!');
         });

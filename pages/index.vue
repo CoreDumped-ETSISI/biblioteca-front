@@ -18,6 +18,8 @@
           target="_blank"
           class="button--grey"
         >GitHub</a>
+        <b-button variant="success" v-on:click="changePage()">Change</b-button>
+
       </div>
     </div>
   </section>
@@ -27,11 +29,22 @@
 
 export default {
   components: {
+  },
+
+
+  methods: {
+
+        changePage(){
+          console.log("Hey")
+          this.$router.push({
+              path: '/patata'
+          })
+        }
   }
 }
 </script>
 
-<style>
+<style scoped>
 .container {
   margin: 0 auto;
   min-height: 100vh;
