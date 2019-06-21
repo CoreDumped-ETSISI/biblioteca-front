@@ -37,7 +37,8 @@ export default {
         changePage(){
           console.log("Hey")
           this.$router.push({
-              path: '/patata'
+              name: 'patata',
+              params: { name: 'world' }
           })
         }
   }

@@ -70,5 +70,17 @@
     </b-form-group>
 			<b-button style="float:right;" class="mr-2" variant="success">Upload File</b-button>
   </b-card>
+  <b-button variant="success" v-on:click="getData()">Get My data</b-button>
 </div>
 </template>
+
+<script>
+  export default {
+    methods: {
+      getData(){
+        console.log(this.$route.params.sha1)
+      }
+    }
+  }
+</script>
+

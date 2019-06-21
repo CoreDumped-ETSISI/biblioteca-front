@@ -10,7 +10,102 @@
             accept=".pdf, .epub"
             name="book" class="mb-2"></b-form-file>
 
-          <b-button block class="mr-2" variant="success" v-on:click="submitFile()">Upload File</b-button>
+          <b-button 
+            :disabled="!Boolean(file)"
+            block class="mr-2" 
+            variant="primary" 
+            v-on:click="extractMeta()">
+            Extract metadata
+            <b-spinner small v-if="loaderVisible"></b-spinner>
+          </b-button>
+      
+       <b-collapse id="collapse-1" :visible="isVisible">
+      <b-form-group
+      label-cols-lg="3"
+      label="Title"
+      label-size="lg"
+      label-class="font-weight-bold pt-0"
+      class="mb-0"
+    >
+      <b-form-group
+        label-cols-sm="3"
+        label="Title:"
+        label-align-sm="right"
+        label-for="nested-title"
+      >
+        <b-form-input id="nested-title" v-model="title"></b-form-input>
+      </b-form-group>
+
+      <b-form-group
+        label-cols-sm="3"
+        label="Author:"
+        label-align-sm="right"
+        label-for="nested-author"
+      >
+        <b-form-input id="nested-author"  v-model="author"></b-form-input>
+      </b-form-group>
+
+       <b-form-group
+        label-cols-sm="3"
+        label="Number of Pages:"
+        label-align-sm="right"
+        label-for="nested-pages"
+      >
+        <b-form-input type="number" id="nested-pages"  v-model="pageNumber"></b-form-input>
+      </b-form-group>
+
+      <b-form-group
+        label-cols-sm="3"
+        label="Category:"
+        label-align-sm="right"
+        label-for="nested-category"
+      >
+        <b-form-input id="nested-category" v-model="category"></b-form-input>
+      </b-form-group>
+
+      <b-form-group
+        label-cols-sm="3"
+        label="Publisher:"
+        label-align-sm="right"
+        label-for="nested-publisher"
+      >
+        <b-form-input id="nested-publisher" v-model="publisher"></b-form-input>
+      </b-form-group>
+
+			<b-form-group
+        label-cols-sm="3"
+        label="Publish Date:"
+        label-align-sm="right"
+        label-for="nested-date"
+      >
+        <b-form-input id="nested-date" type="number" v-model="date"></b-form-input>
+      </b-form-group>
+
+			<b-form-group
+        label-cols-sm="3"
+        label="Synopsis:"
+        label-align-sm="right"
+        label-for="nested-synopsis"
+      >
+        <b-form-textarea
+				id="nested-synopsis"
+				placeholder="Enter something..."
+				rows="3"
+				max-rows="4"
+        v-model="synopsis"
+    ></b-form-textarea>
+      </b-form-group>
+    </b-form-group>
+
+    <b-button 
+      block 
+      class="mr-2" 
+      variant="success" 
+      :disabled="!isComplete"
+      v-on:click="submitFile()">
+      Upload File
+    </b-button>
+      </b-collapse>
       </div>
        <div class="text-center col-md-9" style="margin: 50px auto 0;">
         <b-spinner 
@@ -24,6 +119,7 @@
       </div>
     </div>
     <b-button variant="success" v-on:click="changePage()">Change</b-button>
+    <b-button variant="success" v-on:click="getData()">Get My data</b-button>
   </div>
 </template>
 
@@ -37,40 +133,130 @@
     data(){
       return {
         file: '',
-        buttonsLoading: false
+        buttonsLoading: false,
+        author: "author1",
+        title: "title1",
+        pageNumber: 24,
+        category: "hola",
+        publisher: "adios",
+        date: 2014,
+        synopsis: "gut",
+        isVisible: false,
+        loaderVisible: false
+      }
+    },
+    computed: {
+      isComplete () {
+        return this.file && this.author && this.title && this.pageNumber && this.category 
+          && this.publisher && this.date && this.synopsis;
       }
     },
 
     methods: {
-      changePage(){
+      changePage(data){
         console.log("Hey")
         this.$router.push({
-            path: '/'
+            name: 'fillBook',
+            params: { sha1: data }
         })
       },
 
-      submitFile(){
+      getData(){
+        console.log(this.$route.params.name)
+      },
 
+      extractMeta(){
+        let formData = new FormData();
+        let localThis = this
+
+        formData.append('book', this.file);
+        localThis.loaderVisible = true
+    
+        axios.post( 'http://localhost:3003/book/getMetadata',
+            formData,
+            {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+          }
+        ).then(function(response){
+          console.log(response)
+          localThis.author = response.data.author
+          localThis.title = response.data.title
+          localThis.pageNumber = response.data.pageNumber
+          localThis.isVisible = true
+          localThis.loaderVisible = false
+          console.log('SUCCESS!!');
+          })
+        .catch(function(err){
+          console.log(err)
+          console.log('FAILURE!!');
+        });
+      },
+
+      submitFile(){
         this.buttonsLoading = true;
            console.log(this.file);
             let formData = new FormData();
 
+            let data = {
+              title: this.title,
+              author: this.author,
+              category: this.category,
+              synopsis: this.synopsis,
+              date: this.date,
+              publisher: this.publisher,
+              pageNumber: this.pageNumber
+            }
+
             formData.append('book', this.file);
-        
-            axios.post( 'http://localhost:3003/book/uploadBook',
+           /* formData.append('title', this.title);
+            formData.append('author', this.author);
+            formData.append('category', this.category);
+            formData.append('synopsis', this.synopsis);
+            formData.append('date', this.date);
+            formData.append('publisher', this.publisher);
+            formData.append('pageNumber', this.pageNumber);*/
+            formData.append('data', JSON.stringify(data));
+
+            console.log(formData);
+
+            /*axios({
+              method: 'post',
+              url: 'http://localhost:3003/book/newUploadBook',
+              headers: { 'Content-Type': 'multipart/form-data' }, 
+              data: {
+                book: this.file,
+                title: this.title,
+                author: this.author,
+                category: this.category,
+                synopsis: this.synopsis,
+                date: this.date,
+                publisher: this.publisher,
+                pageNumber: this.pageNumber
+              }
+            }).then(function(response){
+              console.log(response)
+              console.log('SUCCESS!!');
+          })
+            .catch(function(err){
+              console.log(err)
+              console.log('FAILURE!!');
+            });*/
+
+            axios.post( 'http://localhost:3003/book/newUploadBook',
                 formData,
                 {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                  'Content-Type': 'multipart/form-data'
                 }
               }
-            ).then(function(){
-              buttonsLoading = false;
-              console.log('1'+this.$router);
-              this.$router.push('http://localhost:3000/fillBook');
+            ).then(function(response){
+              console.log(response)
               console.log('SUCCESS!!');
           })
-        .catch(function(){
+        .catch(function(err){
+          console.log(err)
           console.log('FAILURE!!');
         });
       },
@@ -82,3 +268,9 @@
     }
   }
 </script>
+
+<style>
+  #collapse-1 {
+    margin: 20px;
+  }
+</style>
