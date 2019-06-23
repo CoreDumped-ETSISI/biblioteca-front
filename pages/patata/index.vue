@@ -3,7 +3,7 @@
     <div>
       <div class="row">
         <div class="col-md-9 m-auto">
-          <h1 class="text-center display-4 my-4">Mongo File Uploads</h1>
+          <h1 class="text-center display-4 my-4">Sube un libro</h1>
           <b-form-file v-model="file" :state="Boolean(file)"
             placeholder="Choose a file..."
             drop-placeholder="Drop file here..."
@@ -118,8 +118,6 @@
       </div>
       </div>
     </div>
-    <b-button variant="success" v-on:click="changePage()">Change</b-button>
-    <b-button variant="success" v-on:click="getData()">Get My data</b-button>
   </div>
 </template>
 
@@ -137,10 +135,10 @@
         author: "author1",
         title: "title1",
         pageNumber: 24,
-        category: "hola",
-        publisher: "adios",
-        date: 2014,
-        synopsis: "gut",
+        category: "",
+        publisher: "",
+        date: null,
+        synopsis: "",
         isVisible: false,
         loaderVisible: false
       }
@@ -153,11 +151,10 @@
     },
 
     methods: {
-      changePage(data){
+      changePage(){
         console.log("Hey")
         this.$router.push({
-            name: 'fillBook',
-            params: { sha1: data }
+            path: '/bookCatalogue'
         })
       },
 
@@ -196,6 +193,7 @@
 
       submitFile(){
         this.buttonsLoading = true;
+        let localThis = this
            console.log(this.file);
             let formData = new FormData();
 
@@ -206,43 +204,15 @@
               synopsis: this.synopsis,
               date: this.date,
               publisher: this.publisher,
-              pageNumber: this.pageNumber
+              pageNumber: this.pageNumber,
+              size: this.file.size
             }
 
             formData.append('book', this.file);
-           /* formData.append('title', this.title);
-            formData.append('author', this.author);
-            formData.append('category', this.category);
-            formData.append('synopsis', this.synopsis);
-            formData.append('date', this.date);
-            formData.append('publisher', this.publisher);
-            formData.append('pageNumber', this.pageNumber);*/
             formData.append('data', JSON.stringify(data));
 
             console.log(formData);
 
-            /*axios({
-              method: 'post',
-              url: 'http://localhost:3003/book/newUploadBook',
-              headers: { 'Content-Type': 'multipart/form-data' }, 
-              data: {
-                book: this.file,
-                title: this.title,
-                author: this.author,
-                category: this.category,
-                synopsis: this.synopsis,
-                date: this.date,
-                publisher: this.publisher,
-                pageNumber: this.pageNumber
-              }
-            }).then(function(response){
-              console.log(response)
-              console.log('SUCCESS!!');
-          })
-            .catch(function(err){
-              console.log(err)
-              console.log('FAILURE!!');
-            });*/
 
             axios.post( 'http://localhost:3003/book/newUploadBook',
                 formData,
@@ -254,11 +224,12 @@
             ).then(function(response){
               console.log(response)
               console.log('SUCCESS!!');
-          })
-        .catch(function(err){
-          console.log(err)
-          console.log('FAILURE!!');
-        });
+              localThis.changePage();
+            })
+            .catch(function(err){
+              console.log(err)
+              console.log('FAILURE!!');
+            });
       },
 
       

@@ -1,7 +1,7 @@
 <template>
 <div id="book-test">
     <b-card-group columns>     
-        <book v-for="n in 10"></book>
+        <book v-for="n in 2"></book>
     </b-card-group>
     <div class="overflow-auto">
       <b-pagination-nav :link-gen="linkGen" :number-of-pages="10" use-router></b-pagination-nav>
