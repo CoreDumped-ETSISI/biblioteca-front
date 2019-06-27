@@ -44,7 +44,8 @@ export default {
         pageNumber: Number,
         size: Number,
         filename: String,
-        format: String
+        format: String,
+        
     },
     methods: {
         download(){
