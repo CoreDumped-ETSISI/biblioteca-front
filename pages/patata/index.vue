@@ -95,6 +95,15 @@
         v-model="synopsis"
     ></b-form-textarea>
       </b-form-group>
+      <hr>
+      
+      <b-form-file v-model="image" :state="Boolean(image)"
+            placeholder="Choose a book cover..."
+            drop-placeholder="Drop file here..."
+            accept=".png, .PNG, .jpg, .JPG, .jpeg, .JPEG, .jpe, .JPE, .jif, .JIF, .jfif, .JFIF, .jfi, .JFI"
+            name="image" class="mb-2"></b-form-file>
+            
+
     </b-form-group>
 
     <b-button 
@@ -131,6 +140,7 @@
     data(){
       return {
         file: '',
+        image: '',
         buttonsLoading: false,
         author: "author1",
         title: "title1",
@@ -181,6 +191,10 @@
           localThis.author = response.data.author
           localThis.title = response.data.title
           localThis.pageNumber = response.data.pageNumber
+          localThis.synopsis = response.data.synopsis
+          localThis.publisher = response.data.publisher
+          localThis.date = response.data.publishDate
+          localThis.category = response.data.category
           localThis.isVisible = true
           localThis.loaderVisible = false
           console.log('SUCCESS!!');
@@ -205,7 +219,8 @@
               date: this.date,
               publisher: this.publisher,
               pageNumber: this.pageNumber,
-              size: this.file.size
+              size: this.file.size,
+              imageFormat: this.image.name.split('.')[1]
             }
 
             formData.append('book', this.file);
@@ -214,7 +229,7 @@
             console.log(formData);
 
 
-            axios.post( 'http://localhost:3003/book/newUploadBook',
+            axios.post( 'http://localhost:3003/book/uploadBook',
                 formData,
                 {
                 headers: {
@@ -223,13 +238,47 @@
               }
             ).then(function(response){
               console.log(response)
-              console.log('SUCCESS!!');
-              localThis.changePage();
+              console.log('SUCCESS BOOK!!');
+              console.log(response.data.message.sha1)
+              localThis.uploadImage(response.data.message.sha1)
             })
             .catch(function(err){
               console.log(err)
               console.log('FAILURE!!');
             });
+      },
+
+      uploadImage(sha1){
+        let localThis = this
+        console.log(this.file);
+        let formData = new FormData();
+
+        let data = {
+          sha1: sha1
+        }
+
+        formData.append('image', this.image);
+        formData.append('data', JSON.stringify(data));
+
+        console.log(formData);
+
+
+        axios.post( 'http://localhost:3003/book/uploadImage',
+            formData,
+            {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+        ).then(function(response){
+          console.log(response)
+          console.log('SUCCESS!!');
+          localThis.changePage();
+        })
+        .catch(function(err){
+          console.log(err)
+          console.log('FAILURE!!');
+        });
       },
 
       

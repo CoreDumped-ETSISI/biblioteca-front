@@ -12,7 +12,9 @@
             :pageNumber=post.pageNumber 
             :size=post.size 
             :filename=post.filename 
-            :format=post.format>
+            :format=post.format 
+            :sha1=post.sha1 
+            :imageFormat=post.imageFormat>
         </book>
     </b-card-group>
     <div class="overflow-auto">

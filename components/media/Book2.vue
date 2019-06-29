@@ -7,7 +7,7 @@
       </b-col>
       <b-col md="7">
         <b-card-body :title="title" :sub-title="author">
-          <b-card-text>
+          <b-card-text class="limitLines">
             {{ this.synopsis }}
           </b-card-text>
           <b-list-group flush>
@@ -31,7 +31,7 @@ export default {
     data(){
         return {
             description: 'Descripción por defecto, quizá demasiado corta',
-            imageSrc: 'https://picsum.photos/210/290',
+            imageSrc: 'http://localhost:3003/'+this.sha1+'.'+this.imageFormat,
             downloads: [{'type':'PDF', 'url':'#'},{'type':'EPUB', 'url':'#'},{'type':'GBA', 'url':'#'}]
         }
     },
@@ -45,8 +45,10 @@ export default {
         size: Number,
         filename: String,
         format: String,
-        
+        imageFormat: String,
+        sha1: String
     },
+
     methods: {
         download(){
             let url = 'http://localhost:3003/book/download/'+this.filename
@@ -83,5 +85,13 @@ export default {
     display: block;
     width: 100%;
     margin-top: 5px;
+}
+.limitLines {
+  overflow: hidden;
+  position: relative; 
+  line-height: 1.2em;
+  max-height: 7.2em; 
+  margin-right: -1em;
+  padding-right: 1em;
 }
 </style>
