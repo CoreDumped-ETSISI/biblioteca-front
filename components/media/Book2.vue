@@ -2,7 +2,7 @@
   <b-card no-body class="overflow-hidden" style="max-width: 540px;">
     <b-row no-gutters>
       <b-col md="5">
-        <b-card-img :src=this.imageSrc class="rounded-0"></b-card-img>
+        <b-card-img :src=getBookWithImage class="rounded-0"></b-card-img>
         <b-button class="topmargin" variant="success" v-on:click="download()">Descarga</b-button>
       </b-col>
       <b-col md="7">
@@ -34,6 +34,11 @@ export default {
             imageSrc: 'http://localhost:3003/'+this.sha1+'.'+this.imageFormat,
             downloads: [{'type':'PDF', 'url':'#'},{'type':'EPUB', 'url':'#'},{'type':'GBA', 'url':'#'}]
         }
+    },
+    computed: {
+      getBookWithImage() {
+        return 'http://localhost:3003/'+this.sha1+'.'+this.imageFormat
+      }
     },
     props: {
         title: String,
