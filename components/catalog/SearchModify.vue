@@ -19,7 +19,9 @@
     <b-card-group columns>     
         <book 
             v-for="post of searchAllFields" 
-            v-bind:key="post.id" 
+            v-bind:key="post.id"
+            :id=post._id
+            :status=post.status
             :title=post.title 
             :author=post.author 
             :synopsis=post.synopsis 
@@ -36,7 +38,7 @@
 
 <script>
 import axios from 'axios';
-import book from '~/components/media/Book2.vue'
+import book from '~/components/media/BookModify.vue'
 import Multiselect from 'vue-multiselect'
 
 export default {
@@ -60,7 +62,7 @@ export default {
       errors: [],
       text: '',
       selected: null,
-      options: ['title', 'author', 'synopsis', 'publisher'],
+      options: ['title', 'author', 'synopsis', 'publisher', 'status'],
       value: [],
       noResult: false
     }

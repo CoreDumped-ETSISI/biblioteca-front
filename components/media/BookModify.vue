@@ -4,6 +4,14 @@
       <b-col md="5">
         <b-card-img :src=getBookWithImage class="rounded-0"></b-card-img>
         <b-button class="topmargin" variant="success" v-on:click="download()">Descarga</b-button>
+        <b-form-select
+            v-model="selected"
+            :options="options"
+            value-field="item"
+            text-field="text"
+            disabled-field="notEnabled"
+						v-on:change="onChange"
+        ></b-form-select>
       </b-col>
       <b-col md="7">
         <b-card-body :title="title" :sub-title="author">
@@ -13,7 +21,7 @@
           <b-list-group flush>
             <b-list-group-item><strong>Editorial: </strong>{{ publisher }}</b-list-group-item>
             <b-list-group-item><strong>Tamaño (Bytes): </strong>{{ size }}</b-list-group-item>
-          </b-list-group>
+            </b-list-group>
 
         </b-card-body>
       </b-col>
@@ -25,12 +33,18 @@
 import axios from 'axios';
 
 export default {    
-    
     data(){
         return {
             description: 'Descripción por defecto, quizá demasiado corta',
             imageSrc: 'http://localhost:3003/'+this.sha1+'.'+this.imageFormat,
-            downloads: [{'type':'PDF', 'url':'#'},{'type':'EPUB', 'url':'#'},{'type':'GBA', 'url':'#'}]
+            statuses: ['pending', 'accepted', 'denied', 'erased'],
+            selected: this.status,
+						options: [
+							{ item: 'pending', text: 'Status: pending' },
+							{ item: 'accepted', text: 'Status: accepted' },
+							{ item: 'denied', text: 'Status: denied' },
+							{ item: 'erased', text: 'Status: erased' }
+						]
         }
     },
     computed: {
@@ -39,6 +53,7 @@ export default {
       }
     },
     props: {
+        status: String,
         title: String,
         author: String,
         synopsis: String,
@@ -49,10 +64,22 @@ export default {
         filename: String,
         format: String,
         imageFormat: String,
-        sha1: String,
+				sha1: String,
+				id: String
     },
 
     methods: {
+				onChange(){
+					console.log(this.selected)
+					axios.put(`http://localhost:3003/book/`+this.id, {
+						status: this.selected 
+					})
+					.then(response => {console.log(response)})
+					.catch(e => {
+						this.errors.push(e)
+						console.log('error')
+					})
+				},
         download(){
             let url = 'http://localhost:3003/book/download/'+this.filename
             axios({
