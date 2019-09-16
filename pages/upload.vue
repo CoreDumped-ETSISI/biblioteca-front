@@ -8,8 +8,8 @@
             placeholder="Choose a file..."
             drop-placeholder="Drop file here..."
             accept=".pdf, .epub"
+            v-on:change="fileChange()"
             name="book" class="mb-2"></b-form-file>
-
           <b-button 
             :disabled="!Boolean(file)"
             block class="mr-2" 
@@ -18,118 +18,118 @@
             Extract metadata
             <b-spinner small v-if="loaderVisible"></b-spinner>
           </b-button>
-      
-       <b-collapse id="collapse-1" :visible="isVisible">
-      <b-form-group
-      label-cols-lg="3"
-      label="Title"
-      label-size="lg"
-      label-class="font-weight-bold pt-0"
-      class="mb-0"
-    >
-      <b-form-group
-        label-cols-sm="3"
-        label="Title:"
-        label-align-sm="right"
-        label-for="nested-title"
-      >
-        <b-form-input id="nested-title" v-model="title"></b-form-input>
-      </b-form-group>
-
-      <b-form-group
-        label-cols-sm="3"
-        label="Author:"
-        label-align-sm="right"
-        label-for="nested-author"
-      >
-        <b-form-input id="nested-author"  v-model="author"></b-form-input>
-      </b-form-group>
-
-       <b-form-group
-        label-cols-sm="3"
-        label="Number of Pages:"
-        label-align-sm="right"
-        label-for="nested-pages"
-      >
-        <b-form-input type="number" id="nested-pages"  v-model="pageNumber"></b-form-input>
-      </b-form-group>
-
-      <b-form-group
-        label-cols-sm="3"
-        label="Category:"
-        label-align-sm="right"
-        label-for="nested-category"
-      >
-        <b-form-input id="nested-category" v-model="category"></b-form-input>
-      </b-form-group>
-
-      <b-form-group
-        label-cols-sm="3"
-        label="Publisher:"
-        label-align-sm="right"
-        label-for="nested-publisher"
-      >
-        <b-form-input id="nested-publisher" v-model="publisher"></b-form-input>
-      </b-form-group>
-
-			<b-form-group
-        label-cols-sm="3"
-        label="Publish Date:"
-        label-align-sm="right"
-        label-for="nested-date"
-      >
-        <b-form-input id="nested-date" type="number" v-model="date"></b-form-input>
-      </b-form-group>
-
-			<b-form-group
-        label-cols-sm="3"
-        label="Synopsis:"
-        label-align-sm="right"
-        label-for="nested-synopsis"
-      >
-        <b-form-textarea
-				id="nested-synopsis"
-				placeholder="Enter something..."
-				rows="3"
-				max-rows="4"
-        v-model="synopsis"
-    ></b-form-textarea>
-      </b-form-group>
-      <hr>
-      
-      <b-form-file v-model="image" :state="Boolean(image)"
-            placeholder="Choose a book cover..."
-            drop-placeholder="Drop file here..."
-            accept=".png, .PNG, .jpg, .JPG, .jpeg, .JPEG, .jpe, .JPE, .jif, .JIF, .jfif, .JFIF, .jfi, .JFI"
-            name="image" class="mb-2"></b-form-file>
-            
-
-    </b-form-group>
-
-    <b-button 
-      block 
-      class="mr-2" 
-      variant="success" 
-      :disabled="!isComplete"
-      v-on:click="submitFile()">
-      Upload File
-    </b-button>
-      </b-collapse>
-      </div>
-       <div class="text-center col-md-9" style="margin: 50px auto 0;">
-        <b-spinner 
-          class="center" 
-          style="width: 3rem; height: 3rem;" 
-          variant="warning" 
-          label="Text Centered"
-          v-if="buttonsLoading"
-        ></b-spinner>
-      </div>
+          <b-collapse id="collapse-1" :visible="isVisible">
+            <b-form-group
+              label-cols-lg="3"
+              label="Title"
+              label-size="lg"
+              label-class="font-weight-bold pt-0"
+              class="mb-0"
+              >
+              <b-form-group
+                label-cols-sm="3"
+                label="Title:"
+                label-align-sm="right"
+                label-for="nested-title"
+                >
+                <b-form-input id="nested-title" v-model="title"></b-form-input>
+              </b-form-group>
+              <b-form-group
+                label-cols-sm="3"
+                label="Author:"
+                label-align-sm="right"
+                label-for="nested-author"
+                >
+                <b-form-input id="nested-author"  v-model="author"></b-form-input>
+              </b-form-group>
+              <b-form-group
+                label-cols-sm="3"
+                label="Number of Pages:"
+                label-align-sm="right"
+                label-for="nested-pages"
+                >
+                <b-form-input type="number" id="nested-pages"  v-model="pageNumber"></b-form-input>
+              </b-form-group>
+              <b-form-group
+                label-cols-sm="3"
+                label="Category:"
+                label-align-sm="right"
+                label-for="nested-category"
+                >
+                <b-form-input id="nested-category" v-model="category"></b-form-input>
+              </b-form-group>
+              <b-form-group
+                label-cols-sm="3"
+                label="Publisher:"
+                label-align-sm="right"
+                label-for="nested-publisher"
+                >
+                <b-form-input id="nested-publisher" v-model="publisher"></b-form-input>
+              </b-form-group>
+              <b-form-group
+                label-cols-sm="3"
+                label="Publish Date:"
+                label-align-sm="right"
+                label-for="nested-date"
+                >
+                <b-form-input id="nested-date" type="number" v-model="date"></b-form-input>
+              </b-form-group>
+              <b-form-group
+                label-cols-sm="3"
+                label="Synopsis:"
+                label-align-sm="right"
+                label-for="nested-synopsis"
+                >
+                <b-form-textarea
+                  id="nested-synopsis"
+                  placeholder="Enter something..."
+                  rows="3"
+                  max-rows="4"
+                  v-model="synopsis"
+                  ></b-form-textarea>
+              </b-form-group>
+              <b-form-group
+                label-cols-sm="3"
+                label="Language:"
+                label-align-sm="right"
+                label-for="nested-language"
+                >
+                <b-form-select v-model="selectedLanguage" id="nested-language">
+                  <option value="es">Español</option>
+                  <option value="en">Inglés</option>
+                </b-form-select>
+              </b-form-group>
+              
+              <hr>
+              <b-form-file v-model="image" :state="Boolean(image)"
+                placeholder="Choose a book cover..."
+                drop-placeholder="Drop file here..."
+                accept=".png, .PNG, .jpg, .JPG, .jpeg, .JPEG, .jpe, .JPE, .jif, .JIF, .jfif, .JFIF, .jfi, .JFI"
+                name="image" class="mb-2"></b-form-file>
+            </b-form-group>
+            <b-button 
+              block 
+              class="mr-2" 
+              variant="success" 
+              :disabled="!isComplete"
+              v-on:click="submitFile()">
+              Upload File
+            </b-button>
+          </b-collapse>
+        </div>
+        <div class="text-center col-md-9" style="margin: 50px auto 0;">
+          <b-spinner 
+            class="center" 
+            style="width: 3rem; height: 3rem;" 
+            variant="warning" 
+            label="Text Centered"
+            v-if="buttonsLoading"
+            ></b-spinner>
+        </div>
       </div>
     </div>
   </div>
 </template>
-
 
 <script>
     import axios from 'axios';
@@ -142,15 +142,16 @@
         file: '',
         image: '',
         buttonsLoading: false,
-        author: "author1",
-        title: "title1",
-        pageNumber: 24,
+        author: "",
+        title: "",
+        pageNumber: null,
         category: "",
         publisher: "",
         date: null,
         synopsis: "",
         isVisible: false,
-        loaderVisible: false
+        loaderVisible: false,
+        selectedLanguage: "en"
       }
     },
     computed: {
@@ -195,6 +196,11 @@
           localThis.publisher = response.data.publisher
           localThis.date = response.data.publishDate
           localThis.category = response.data.category
+          if(response.data.language!=null && ["en", "es"].includes(response.data.language)){
+            console.log("Language is "+response.data.language)
+            localThis.selectedLanguage = response.data.language
+          }
+          localThis.selectedLanguage
           localThis.isVisible = true
           localThis.loaderVisible = false
           console.log('SUCCESS!!');
@@ -246,6 +252,22 @@
               console.log(err)
               console.log('FAILURE!!');
             });
+      },
+
+      fileChange(){
+        this.isVisible = false
+        this.image = ''
+        this.imagebuttonsLoading = false
+        this.imageauthor = ""
+        this.imagetitle = ""
+        this.imagepageNumber = null
+        this.imagecategory = ""
+        this.imagepublisher = ""
+        this.imagedate = null
+        this.imagesynopsis = ""
+        this.imageisVisible = false
+        this.imageloaderVisible = false
+        this.imageselectedLanguage = "en"
       },
 
       uploadImage(sha1){
