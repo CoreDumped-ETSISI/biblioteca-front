@@ -11,9 +11,11 @@
             :publisher=post.publisher 
             :pageNumber=post.pageNumber 
             :size=post.size 
+            :tags=post.tags
             :filename=post.filename 
             :format=post.format 
             :sha1=post.sha1 
+            :language=post.language
             :imageFormat=post.imageFormat>
         </book>
     </b-card-group>

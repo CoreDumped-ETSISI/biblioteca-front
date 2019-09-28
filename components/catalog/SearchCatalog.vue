@@ -25,6 +25,8 @@
             :synopsis=post.synopsis 
             :publisher=post.publisher 
             :size=post.size 
+            :language=post.language
+            :tags=post.tags
             :filename=post.filename 
             :format=post.format
             :sha1=post.sha1
@@ -60,7 +62,7 @@ export default {
       errors: [],
       text: '',
       selected: null,
-      options: ['title', 'author', 'synopsis', 'publisher'],
+      options: ['title', 'author', 'synopsis', 'publisher', 'tags'],
       value: [],
       noResult: false
     }
@@ -77,7 +79,12 @@ export default {
       return this.posts.filter(function(post){
         var i
         for(i=0 ; i<categories.length ; i++){
-          if(post[categories[i]].toLowerCase().includes(localThis.text.toLowerCase())){
+          if(categories[i] === 'tags'){
+            if(post[categories[i]].length > 0 && post[categories[i]].filter(s =>
+             s.includes(localThis.text.toLowerCase())).length>0)
+              return true
+          }
+          else if(post[categories[i]].toLowerCase().includes(localThis.text.toLowerCase())){
             localThis.noResult = false
             return true
           }
@@ -91,6 +98,11 @@ export default {
     axios.get(`http://localhost:3003/book/getAllBooks`)
     .then(response => {
       this.posts = response.data.books
+      this.posts = this.posts.filter(function(post){
+        if(post.status === "accepted")
+          return true
+        return false
+      })
       console.log(this.posts)
     })
     .catch(e => {

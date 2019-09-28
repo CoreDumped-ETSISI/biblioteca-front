@@ -27,6 +27,8 @@
             :synopsis=post.synopsis 
             :publisher=post.publisher 
             :size=post.size 
+            :language=post.language
+            :tags=post.tags
             :filename=post.filename 
             :format=post.format
             :sha1=post.sha1
@@ -38,7 +40,7 @@
 
 <script>
 import axios from 'axios';
-import book from '~/components/media/BookModify.vue'
+import book from '~/components/media/Book2.vue'
 import Multiselect from 'vue-multiselect'
 
 export default {

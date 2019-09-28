@@ -44,27 +44,24 @@
               </b-form-group>
               <b-form-group
                 label-cols-sm="3"
-                label="Number of Pages:"
-                label-align-sm="right"
-                label-for="nested-pages"
-                >
-                <b-form-input type="number" id="nested-pages"  v-model="pageNumber"></b-form-input>
-              </b-form-group>
-              <b-form-group
-                label-cols-sm="3"
-                label="Category:"
-                label-align-sm="right"
-                label-for="nested-category"
-                >
-                <b-form-input id="nested-category" v-model="category"></b-form-input>
-              </b-form-group>
-              <b-form-group
-                label-cols-sm="3"
                 label="Publisher:"
                 label-align-sm="right"
                 label-for="nested-publisher"
                 >
                 <b-form-input id="nested-publisher" v-model="publisher"></b-form-input>
+              </b-form-group>
+              <b-form-group
+                label-cols-sm="3"
+                label="Tags:"
+                label-align-sm="right"
+                label-for="nested-tags"
+                >
+                <b-badge 
+                  v-for="badge in getTags"
+                  v-bind:key="badge"
+                  variant="primary">{{badge}}
+                </b-badge>
+                <b-form-input id="nested-tags" v-model="tags"></b-form-input>
               </b-form-group>
               <b-form-group
                 label-cols-sm="3"
@@ -144,20 +141,28 @@
         buttonsLoading: false,
         author: "",
         title: "",
-        pageNumber: null,
-        category: "",
         publisher: "",
+        tags: "",
         date: null,
         synopsis: "",
         isVisible: false,
         loaderVisible: false,
-        selectedLanguage: "en"
+        selectedLanguage: "en",
+        badges: "     hola     ,     adios    ,     hasta luego    , "
       }
     },
     computed: {
       isComplete () {
-        return this.file && this.author && this.title && this.pageNumber && this.category 
+        return this.file && this.author && this.title
           && this.publisher && this.date && this.synopsis;
+      },
+      getTags () {
+        var tagArr = this.tags.split(",")
+        for(var i=0;i<tagArr.length;i++)
+          tagArr[i] = tagArr[i].trim()
+        if(tagArr[tagArr.length-1] === "")
+          tagArr.pop();
+        return tagArr;
       }
     },
 
@@ -191,11 +196,9 @@
           console.log(response)
           localThis.author = response.data.author
           localThis.title = response.data.title
-          localThis.pageNumber = response.data.pageNumber
           localThis.synopsis = response.data.synopsis
           localThis.publisher = response.data.publisher
           localThis.date = response.data.publishDate
-          localThis.category = response.data.category
           if(response.data.language!=null && ["en", "es"].includes(response.data.language)){
             console.log("Language is "+response.data.language)
             localThis.selectedLanguage = response.data.language
@@ -220,13 +223,13 @@
             let data = {
               title: this.title,
               author: this.author,
-              category: this.category,
               synopsis: this.synopsis,
               date: this.date,
               publisher: this.publisher,
-              pageNumber: this.pageNumber,
+              tags: this.getTags,
               size: this.file.size,
-              imageFormat: this.image.name.split('.')[1]
+              imageFormat: this.image.name.split('.')[1],
+              laguage: this.selectedLanguage
             }
 
             formData.append('book', this.file);
@@ -260,8 +263,6 @@
         this.imagebuttonsLoading = false
         this.imageauthor = ""
         this.imagetitle = ""
-        this.imagepageNumber = null
-        this.imagecategory = ""
         this.imagepublisher = ""
         this.imagedate = null
         this.imagesynopsis = ""
