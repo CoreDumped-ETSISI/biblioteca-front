@@ -1,11 +1,12 @@
 <template>
-  <section class="container">
-    <div>
+  <section class="background">
+    <b-card 
+      class="card">
       <h1 class="title">
-        biblio-front
+        Coreteca
       </h1>
       <h2 class="subtitle">
-        Biblioteca digital Core Dumped, sección frontend
+        Biblioteca digital Core Dumped
       </h2>
       <div class="links">
         <a
@@ -18,10 +19,9 @@
           target="_blank"
           class="button--grey"
         >GitHub</a>
-        <b-button variant="success" v-on:click="changePage()">Change</b-button>
-
       </div>
-    </div>
+    </b-card>
+  
   </section>
 </template>
 
@@ -46,21 +46,29 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  margin: 0 auto;
+.card {
+  background: rgba(255, 255, 255, 0.7); 
+  padding: 15px;
+}
+.background {
+  margin: 0 auto !important;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+  background-image: url('~@/assets/book.png');
+  background-size:     cover;
+  background-repeat:   no-repeat;
+  background-position: center center;
 }
 
 .title {
   font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: block;
-  font-weight: 300;
-  font-size: 100px;
+  /*font-weight: 300;*/
+  font-size: 8vw;
   color: #35495e;
   letter-spacing: 1px;
 }
