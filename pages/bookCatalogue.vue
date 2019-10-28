@@ -6,6 +6,7 @@
 import catalog from '~/components/catalog/BookCatalog2.vue'
 
 export default {
+  middleware: 'auth',
   components: {
     catalog
   }

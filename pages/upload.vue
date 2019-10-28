@@ -130,10 +130,9 @@
 
 <script>
     import axios from 'axios';
+    
   export default {
-    /*
-      Defines the data used by the component
-    */
+   middleware: 'auth',
     data(){
       return {
         file: '',

@@ -6,6 +6,7 @@
 import catalog from '~/components/catalog/SearchModify.vue'
 
 export default {
+  middleware: 'auth',
   components: {
     catalog
   }
