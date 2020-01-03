@@ -1,4 +1,5 @@
 const cookieparser = process.server ? require('cookieparser') : undefined
+const axios = process.server ? require('axios') : undefined
 
 export const state = () => {
   return {

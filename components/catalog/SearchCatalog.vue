@@ -1,6 +1,6 @@
 <template>
-<div id="book-test">
-  <div class="row lowMargin">
+<div>
+  <div class="lowMargin">
     <div class="col-md-9 m-auto">
       <h1 class="text-center display-4 my-4">Busca un libro</h1>
       <multiselect 
@@ -95,7 +95,9 @@ export default {
   },
 
   mounted() {
-    axios.get(`http://localhost:3003/book/getAllBooks`)
+    console.log(2)
+    let config = { headers: { Authorization: 'Bearer '+this.$store.state.auth.token } }
+    axios.get(`http://localhost:3003/book/getAllBooks`, config)
     .then(response => {
       this.posts = response.data.books
       this.posts = this.posts.filter(function(post){
