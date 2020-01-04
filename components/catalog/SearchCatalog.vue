@@ -95,8 +95,7 @@ export default {
   },
 
   mounted() {
-    console.log(2)
-    let config = { headers: { Authorization: 'Bearer '+this.$store.state.auth.token } }
+    let config = { headers: { Authorization: 'Bearer '+localStorage.getItem("user-token") } }
     axios.get(`http://localhost:3003/book/getAllBooks`, config)
     .then(response => {
       this.posts = response.data.books

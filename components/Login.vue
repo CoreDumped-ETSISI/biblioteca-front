@@ -28,7 +28,6 @@
 
 <script>
 import axios from "axios";
-const Cookie = process.client ? require('js-cookie') : undefined
 export default {
   data() {
     return {
@@ -53,15 +52,11 @@ export default {
         })
         .then(function(response) {
           console.log(response.data.token);
-		  //localThis.localStorage.setItem("user-token", response.data.token);
-		  localThis.$store.commit('setAuth', response.data.token) // mutating to store for client rendering
-			Cookie.set('auth', response.data) // saving token in cookie for server rendering
-			localThis.changePage()
+		      localStorage.setItem("user-token", response.data.token);
+			    localThis.changePage()
         })
         .catch(function(err) {
-		  //localThis.localStorage.removeItem("user-token");
-		  localThis.$store.commit('setAuth', null)
-		  Cookie.remove('auth')
+		      localStorage.removeItem("user-token");
           alert(err);
         });
     },

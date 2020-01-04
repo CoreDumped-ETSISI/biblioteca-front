@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-if="accessible">
     <div>
       <div class="row">
         <div class="col-md-9 m-auto">
@@ -132,9 +132,9 @@
     import axios from 'axios';
     
   export default {
-   middleware: 'auth',
     data(){
       return {
+        accessible: false,
         file: '',
         image: '',
         buttonsLoading: false,
@@ -166,10 +166,10 @@
     },
 
     methods: {
-      changePage(){
+      changePage(redirect){
         console.log("Hey")
         this.$router.push({
-            path: '/bookCatalogue'
+            path: redirect
         })
       },
 
@@ -228,13 +228,13 @@
               tags: this.getTags,
               size: this.file.size,
               imageFormat: this.image.name.split('.')[1],
-              laguage: this.selectedLanguage
+              language: this.selectedLanguage
             }
 
             formData.append('book', this.file);
             formData.append('data', JSON.stringify(data));
 
-            console.log(formData);
+            console.log(data);
 
 
             axios.post( 'http://localhost:3003/book/uploadBook',
@@ -295,7 +295,7 @@
         ).then(function(response){
           console.log(response)
           console.log('SUCCESS!!');
-          localThis.changePage();
+          localThis.changePage('/bookCatalogue');
         })
         .catch(function(err){
           console.log(err)
@@ -307,6 +307,13 @@
       handleFileUpload(){
         this.file = this.$refs.file.files[0];
       }
+    },
+
+    mounted() {
+      if(localStorage.getItem("user-token") == null)
+      this.changePage('/login')
+    else
+      this.accessible = true
     }
   }
 </script>

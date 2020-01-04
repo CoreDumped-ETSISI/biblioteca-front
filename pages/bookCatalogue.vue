@@ -1,14 +1,31 @@
 <template>
-    <catalog></catalog>
+    <catalog v-if="accessible"></catalog>
 </template>
 
 <script>
 import catalog from '~/components/catalog/BookCatalog2.vue'
 
 export default {
-  middleware: 'auth',
+  data() {
+    return {
+      accessible : false
+    }
+  },
   components: {
     catalog
+  }, 
+   methods: {
+      changePage(){
+        this.$router.push({
+            path: '/login'
+        })
+      }
+  },
+  mounted() {
+    if(localStorage.getItem("user-token") == null)
+      this.changePage()
+    else
+      this.accessible = true
   }
 }
 </script>
