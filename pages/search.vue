@@ -1,14 +1,19 @@
 <template>
-    <catalog></catalog>
+    <div>
+      <topnavbar :logged=true></topnavbar>
+      <catalog></catalog>
+  </div>
 </template>
 
 <script>
 import catalog from '~/components/catalog/SearchCatalog.vue'
+import topnavbar from '../components/Navbar.vue'
 
 export default {
   middleware: 'auth',
   components: {
-    catalog
+    catalog,
+    topnavbar
   }
 }
 </script>

@@ -1,19 +1,8 @@
 <template>
   <div>
-    <topnavbar/>
     <nuxt />
   </div>
 </template>
-
-<script type="text/javascript">
-  import topnavbar from '../components/Navbar.vue'
-  export default{
-    components:{
-      topnavbar // register component
-    }
-  }
-
-</script>
 
 <style>
 html {

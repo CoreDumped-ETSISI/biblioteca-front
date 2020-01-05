@@ -1,4 +1,6 @@
 <template>
+<div>
+  <topnavbar :logged=true></topnavbar>
   <div class="container">
     <div>
       <div class="row">
@@ -126,13 +128,18 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
-    import axios from 'axios';
+  import axios from 'axios';
+  import topnavbar from '../components/Navbar.vue';
     
   export default {
    middleware: 'auth',
+   components: {
+    topnavbar
+  },
     data(){
       return {
         file: '',

@@ -1,47 +1,29 @@
 <template>
-  <section class="background">
-    <b-card 
-      class="card">
-      <h1 class="title">
-        Coreteca
-      </h1>
-      <h2 class="subtitle">
-        Biblioteca digital Core Dumped
-      </h2>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          class="button--green"
-        >Documentation</a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
-        >GitHub</a>
-      </div>
-    </b-card>
-  
-  </section>
+  <div>
+    <topnavbar :logged=false></topnavbar>
+    <section class="background">
+      <b-card 
+        class="card">
+        <h1 class="title">
+          Coreteca
+        </h1>
+        <h2 class="subtitle">
+          Biblioteca digital Core Dumped
+        </h2>
+      </b-card>
+    
+    </section>
+  </div>
 </template>
 
 <script>
+import topnavbar from '../components/Navbar.vue'
 
 export default {
+  middleware: 'isNotLogged',
   components: {
+    topnavbar
   },
-
-
-  methods: {
-
-        changePage(){
-          console.log("Hey")
-          this.$router.push({
-              name: 'patata',
-              params: { name: 'world' }
-          })
-        }
-  }
 }
 </script>
 

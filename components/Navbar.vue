@@ -6,7 +6,7 @@
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav v-if="accessible">
+      <b-navbar-nav v-if="logged">
         <b-nav-item href="/bookcatalogue">Catalogue</b-nav-item>
         <b-nav-item href="/search">Search Book</b-nav-item>
         <b-nav-item href="/upload">Upload</b-nav-item>
@@ -14,9 +14,9 @@
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto" >
-          <b-button v-if="!accessible" class="mybutton" variant="outline-light" to="/login">Sign In</b-button>
-          <b-button v-if="!accessible" class="mybutton" variant="outline-light" to="/register">Register</b-button>
-          <b-button v-if="accessible" class="mybutton" variant="danger" @click="signout">Sign Out</b-button>
+          <b-button v-if="!logged" class="mybutton" variant="outline-light" to="/login">Sign In</b-button>
+          <b-button v-if="!logged" class="mybutton" variant="outline-light" to="/register">Register</b-button>
+          <b-button v-if="logged" class="mybutton" variant="danger" @click="signout">Sign Out</b-button>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
@@ -43,13 +43,8 @@ export default {
     }
   },
 
-  mounted() {
-    let config = { headers: { Authorization: 'Bearer '+localStorage.getItem("user-token") } }
-    let localThis = this
-    axios.get(`http://localhost:3003/user/private`, config)
-    .then(response => {
-      localThis.accessible = true
-    })
+  props: {
+    logged: Boolean
   }
 }
 </script>
