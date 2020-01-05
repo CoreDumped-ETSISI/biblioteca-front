@@ -57,7 +57,7 @@ export default {
   justify-content: center;
   align-items: center;
   text-align: center;
-  background-image: url('~@/assets/book.png');
+  background-image: url('~@/assets/book.PNG');
   background-size:     cover;
   background-repeat:   no-repeat;
   background-position: center center;

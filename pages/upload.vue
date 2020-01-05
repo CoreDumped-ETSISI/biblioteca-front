@@ -228,7 +228,7 @@
               tags: this.getTags,
               size: this.file.size,
               imageFormat: this.image.name.split('.')[1],
-              laguage: this.selectedLanguage
+              language: this.selectedLanguage
             }
 
             formData.append('book', this.file);

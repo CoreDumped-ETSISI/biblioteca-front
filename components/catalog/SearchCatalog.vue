@@ -30,7 +30,8 @@
             :filename=post.filename 
             :format=post.format
             :sha1=post.sha1
-            :imageFormat=post.imageFormat>
+            :imageFormat=post.imageFormat
+            :uploadDate=post.uploadDate>
         </book>
     </b-card-group>
 </div>
@@ -95,8 +96,7 @@ export default {
   },
 
   mounted() {
-    console.log(2)
-    let config = { headers: { Authorization: 'Bearer '+this.$store.state.auth.token } }
+    let config = { headers: { Authorization: 'Bearer '+localStorage.getItem("user-token") } }
     axios.get(`http://localhost:3003/book/getAllBooks`, config)
     .then(response => {
       this.posts = response.data.books

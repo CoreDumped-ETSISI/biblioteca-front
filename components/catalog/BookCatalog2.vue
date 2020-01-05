@@ -1,8 +1,14 @@
 <template>
 <div id="book-test">
-    <b-card-group columns>     
+    <b-pagination
+        v-model="currentPage"
+        :total-rows="rows"
+        :per-page="perPage"
+      ></b-pagination>
+    <b-card-group 
+      columns>     
         <book 
-            v-for="post of posts" 
+            v-for="post of currentPosts" 
             v-bind:key="post.id" 
             :title=post.title 
             :author=post.author 
@@ -16,12 +22,10 @@
             :format=post.format 
             :sha1=post.sha1 
             :language=post.language
-            :imageFormat=post.imageFormat>
+            :imageFormat=post.imageFormat
+            :uploadDate=post.uploadDate>
         </book>
     </b-card-group>
-    <div class="overflow-auto">
-      <b-pagination-nav :link-gen="linkGen" :number-of-pages="10" use-router></b-pagination-nav>
-    </div>
 </div>
 </template>
 
@@ -33,20 +37,29 @@ export default {
   components: {
     book
   },
-  methods: {
-      linkGen(pageNum) {
-        return pageNum === 1 ? '?' : `?page=${pageNum}`
+  computed: {
+      rows() {
+        return this.posts.length
+      },
+      currentPosts() {
+        console.log((this.currentPage-1)*this.perPage )
+        console.log((this.currentPage-1)*this.perPage+this.perPage)
+          return this.posts.slice((this.currentPage-1)*this.perPage, (this.currentPage-1)*this.perPage+this.perPage)
       }
-    },
+  },
+ 
     data() {
     return {
+      perPage: 1,
+      currentPage: 1,
       posts: [],
       errors: []
     }
   },
 
   mounted() {
-    axios.get(`http://localhost:3003/book/getAllBooks`)
+    let config = { headers: { Authorization: 'Bearer '+localStorage.getItem("user-token") } }
+    axios.get(`http://localhost:3003/book/getAllBooks`, config)
     .then(response => {
       this.posts = response.data.books
     })

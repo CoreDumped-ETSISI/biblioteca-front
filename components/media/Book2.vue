@@ -30,6 +30,7 @@
           <b-list-group-item><strong>Idioma: </strong>
             <b-badge :variant=getTag.variant>{{getTag.name}}</b-badge>
           </b-list-group-item>
+          <b-list-group-item><em>{{ getDate }}</em></b-list-group-item>
         </b-list-group>
 
         </b-card-body>
@@ -40,6 +41,7 @@
 
 <script>
 import axios from 'axios';
+import moment from 'moment';
 
 export default {    
     
@@ -79,6 +81,9 @@ export default {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
 
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+      },
+      getDate(){
+        return moment(String(this.uploadDate)).format('MM/DD/YYYY hh:mm')
       }
     },
     props: {
@@ -94,7 +99,8 @@ export default {
         imageFormat: String,
         language: String,
         sha1: String,
-        id: String
+        id: String,
+        uploadDate: Date
     },
 
     methods: {
