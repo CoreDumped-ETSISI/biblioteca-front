@@ -18,7 +18,7 @@
     <h2 class="text-center noResult" v-if="noResult">No hay ningun libro con esos parámetros</h2>
     <b-card-group columns>     
         <book 
-            v-for="post of searchAllFields" 
+            v-for="post of currentPosts" 
             v-bind:key="post.id"
             :id=post._id
             :status=post.status
@@ -36,6 +36,14 @@
             :uploadDate=post.uploadDate>
         </book>
     </b-card-group>
+
+    <b-pagination
+      align="center"
+      v-if="!noResult"
+      v-model="currentPage"
+      :total-rows="rows"
+      :per-page="perPage"
+    ></b-pagination>
 </div>
 </template>
 
@@ -67,7 +75,9 @@ export default {
       selected: null,
       options: ['title', 'author', 'synopsis', 'publisher', 'status'],
       value: [],
-      noResult: false
+      noResult: false,
+      perPage: 6,
+      currentPage: 1
     }
   },
 
@@ -89,6 +99,15 @@ export default {
         }
         return false
       })
+    },
+    rows() {
+        return this.searchAllFields.length
+    },
+
+    currentPosts() {
+        console.log((this.currentPage-1)*this.perPage )
+        console.log((this.currentPage-1)*this.perPage+this.perPage)
+          return this.searchAllFields.slice((this.currentPage-1)*this.perPage, (this.currentPage-1)*this.perPage+this.perPage)
     }
   },
 
@@ -96,7 +115,9 @@ export default {
     let config = { headers: { Authorization: 'Bearer '+localStorage.getItem("user-token") } }
     axios.get(`http://localhost:3003/book/getAllBooks`, config)
     .then(response => {
-      this.posts = response.data.books
+      this.posts = response.data.books.sort(function(a,b){
+        return new Date(b.uploadDate) - new Date(a.uploadDate);
+      });
       console.log(this.posts)
     })
     .catch(e => {

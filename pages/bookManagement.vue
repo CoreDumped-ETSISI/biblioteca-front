@@ -11,7 +11,7 @@ import topnavbar from '../components/Navbar.vue'
 
 export default {
   
-  middleware: 'auth',
+  middleware: 'isAdmin',
   components: {
     catalog,
     topnavbar

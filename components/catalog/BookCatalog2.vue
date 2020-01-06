@@ -1,10 +1,8 @@
 <template>
-<div id="book-test">
-    <b-pagination
-        v-model="currentPage"
-        :total-rows="rows"
-        :per-page="perPage"
-      ></b-pagination>
+<div class="lowMargin">
+    <div class="col-md-9 m-auto">
+      <h1 class="text-center display-4 my-4">Catálogo de libros</h1>
+</div>
     <b-card-group 
       columns>     
         <book 
@@ -26,6 +24,13 @@
             :uploadDate=post.uploadDate>
         </book>
     </b-card-group>
+
+    <b-pagination
+      align="center"
+      v-model="currentPage"
+      :total-rows="rows"
+      :per-page="perPage"
+    ></b-pagination>
 </div>
 </template>
 
@@ -50,7 +55,7 @@ export default {
  
     data() {
     return {
-      perPage: 1,
+      perPage: 6,
       currentPage: 1,
       posts: [],
       errors: []
@@ -61,7 +66,9 @@ export default {
     let config = { headers: { Authorization: 'Bearer '+localStorage.getItem("user-token") } }
     axios.get(`http://localhost:3003/book/getAllBooks`, config)
     .then(response => {
-      this.posts = response.data.books
+      this.posts = response.data.books.sort(function(a,b){
+        return new Date(b.uploadDate) - new Date(a.uploadDate);
+      });
     })
     .catch(e => {
 			this.errors.push(e)
@@ -69,3 +76,10 @@ export default {
   }
 }
 </script>
+
+<style>
+  .lowMargin {
+    margin-bottom: 20px !important;
+  }
+</style>
+
