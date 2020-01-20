@@ -20,18 +20,7 @@
         <book 
             v-for="post of currentPosts" 
             v-bind:key="post.id" 
-            :title=post.title 
-            :author=post.author 
-            :synopsis=post.synopsis 
-            :publisher=post.publisher 
-            :size=post.size 
-            :language=post.language
-            :tags=post.tags
-            :filename=post.filename 
-            :format=post.format
-            :sha1=post.sha1
-            :imageFormat=post.imageFormat
-            :uploadDate=post.uploadDate>
+            :book=post>
         </book>
     </b-card-group>
 

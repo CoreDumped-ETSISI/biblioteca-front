@@ -1,6 +1,6 @@
 <template>
   <div>
-    <topnavbar :logged=false></topnavbar>
+    <topnavbar :semitransparent=true :logged=false></topnavbar>
     <section class="background">
       <b-card 
         class="card">
