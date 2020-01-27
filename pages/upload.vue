@@ -1,7 +1,8 @@
 <template>
   <div>
     <topnavbar :logged="true"></topnavbar>
-    <uploadBook></uploadBook>
+    <uploadBook v-on:file="extractMeta" v-if="!this.accepted"></uploadBook>
+    <editMetadata v-bind:book="this.book" :file="this.file" v-if="this.accepted"></editMetadata>
   </div>
 </template>
 
@@ -140,6 +141,7 @@
   import topnavbar from '../components/Navbar.vue';
   import uploadBook from '../components/upload/upload_book';
   import editMetadata from '../components/upload/edit_metadata';
+  import Book from '../interfaces/book'
 
   export default {
     middleware: 'auth',
@@ -150,26 +152,12 @@
     },
     data() {
       return {
-        file: '',
-        image: '',
-        buttonsLoading: false,
-        author: "",
-        title: "",
-        publisher: "",
-        tags: "",
-        date: null,
-        synopsis: "",
-        isVisible: false,
-        loaderVisible: false,
-        selectedLanguage: "en",
-        badges: "     hola     ,     adios    ,     hasta luego    , "
+        file: {},
+        book: new Book({}),
+        accepted: false
       }
     },
     computed: {
-      isComplete() {
-        return this.file && this.author && this.title &&
-          this.publisher && this.date && this.synopsis;
-      },
       getTags() {
         var tagArr = this.tags.split(",")
         for (var i = 0; i < tagArr.length; i++)
@@ -192,12 +180,11 @@
         console.log(this.$route.params.name)
       },
 
-      extractMeta() {
+      extractMeta(file) {
+        this.file = file;
         let formData = new FormData();
-        let localThis = this
 
-        formData.append('book', this.file);
-        localThis.loaderVisible = true
+        formData.append('book', file);
 
         axios.post('http://localhost:3003/book/getMetadata',
             formData, {
@@ -205,8 +192,15 @@
                 'Content-Type': 'multipart/form-data'
               }
             }
-          ).then(function (response) {
-            console.log(response)
+          ).then(response => {
+            console.log(response.data)
+            const book = new Book(response.data);
+            this.book = book;
+            this.book.format = this.book.filename.split('.').pop();
+            this.book.size = file.size;
+            this.accepted = true;
+            console.log(this.book);
+/*
             localThis.author = response.data.author
             localThis.title = response.data.title
             localThis.synopsis = response.data.synopsis
@@ -219,15 +213,16 @@
             localThis.selectedLanguage
             localThis.isVisible = true
             localThis.loaderVisible = false
-            console.log('SUCCESS!!');
+            console.log('SUCCESS!!');*/
           })
-          .catch(function (err) {
-            console.log(err)
+          .catch(err => {
+            this.accepted = false;
+            console.log(err);
             console.log('FAILURE!!');
           });
       },
 
-      submitFile() {
+    /*  submitFile() {
         this.buttonsLoading = true;
         let localThis = this
         console.log(this.file);
@@ -318,7 +313,7 @@
 
       handleFileUpload() {
         this.file = this.$refs.file.files[0];
-      }
+      }*/
     }
   }
 

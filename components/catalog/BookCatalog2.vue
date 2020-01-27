@@ -107,7 +107,7 @@ section {
   margin: 60px 0;
 }
 #library {
-  width: 70vw;
+  width: 90vw;
 }
 
 .books {
