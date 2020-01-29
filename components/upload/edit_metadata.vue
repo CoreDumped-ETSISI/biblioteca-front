@@ -2,10 +2,14 @@
 import Book from "../../interfaces/book";
 import axios from "axios";
 import keywords from "../../middleware/keywords";
+import tagsEditor  from "./tags_editor.vue"
 export default {
   props: {
     book: Book,
     file: File
+  },
+  components: {
+    tagsEditor
   },
   data() {
     return {
@@ -18,7 +22,6 @@ export default {
     };
   },
   mounted() {
-    this.getAllTags();
     this.book.tags = this.book.tags.length === 0 ? [""] : this.book.tags;
   },
   methods: {
@@ -56,149 +59,6 @@ export default {
     },
     setLang(lang) {
       this.book.language = lang;
-    },
-    getAllTags() {
-      const config = {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("user-token")
-        }
-      };
-      axios
-        .get(`http://localhost:3003/book/getAllBooks`, config)
-        .then(response => {
-          const books = response.data.books;
-          for (let book of books) {
-            this.allTags.push(...book.tags);
-          }
-          this.allTags.push(...keywords.other);
-          this.allTags = this.allTags.map(tag => tag.toLowerCase());
-          this.allTags = this.deleteDuplicates(this.allTags);
-        })
-        .catch(e => {
-          this.errors.push(e);
-        });
-    },
-    tagsCoincidences() {
-      let bookKeywords = (this.book.synopsis + this.book.title).toLowerCase();
-      let bookKeywordsArray = [];
-      if (this.book.title !== "") {
-        bookKeywordsArray.push(
-          ...this.book.title
-            .replace(/[,.;]/g, "")
-            .toLowerCase()
-            .split(" ")
-        );
-      }
-      if (this.book.synopsis !== "") {
-        bookKeywordsArray.push(
-          ...this.book.synopsis
-            .replace(/[,.;]/g, "")
-            .toLowerCase()
-            .split(" ")
-        );
-      }
-      let suggestions = this.intersection(this.allTags, bookKeywords);
-      suggestions.push(
-        ...this.intersection(
-          bookKeywordsArray,
-          keywords.languages.map(el => el.toLowerCase())
-        )
-      );
-
-      suggestions = this.deleteDuplicates(suggestions);
-      suggestions = this.deleteHandyAddedTags(suggestions, this.book.tags);
-      return suggestions;
-    },
-    deleteHandyAddedTags: (suggestions, tags) =>
-      suggestions.filter(tag => !tags.includes(tag)),
-    deleteDuplicates: array =>
-      array.reduce(
-        (unique, item) => (unique.includes(item) ? unique : [...unique, item]),
-        []
-      ),
-    intersection: (arrayA, arrayB) => arrayA.filter(el => arrayB.includes(el)),
-    async onTagsInput(index, event) {
-      const tagEl = document.getElementsByClassName("added-tag")[index];
-      let innerTag = tagEl.value;
-      if (this.book.tags.length > 1 && innerTag === "") {
-        if (
-          [
-            "deleteContentBackward",
-            "deleteContentForward",
-            "deleteByCut"
-          ].includes(event.inputType)
-        ) {
-          if (index > 0) {
-            document.getElementById("tag-" + (index - 1)).focus();
-          }
-          this.removeTag(this.book.tags, index);
-        }
-      } else if (
-        innerTag.charAt(innerTag.length - 1) === "," &&
-        innerTag.length > 1
-      ) {
-        this.book.tags[index] = innerTag.replace(",", "").trim();
-        if (index === this.book.tags.length - 1) {
-          this.book.tags.push([""]);
-        }
-        tagEl.blur();
-        await this.delay(50);
-        if (document.getElementById("tag-" + (index + 1)) !== undefined) {
-          document.getElementById("tag-" + (index + 1)).focus();
-        }
-      } else if (innerTag.charAt(innerTag.length - 1) === ",") {
-        this.book.tags[index] = "";
-      }
-    },
-
-    delay: ms => new Promise(r => setTimeout(r, ms)),
-    getTextWidth: (text, font = "14px Roboto") => {
-      if (text === "" || typeof text !== "string") {
-        text = "Escribe una etiqueta";
-      }
-      let canvas = document.createElement("canvas");
-      let context = canvas.getContext("2d");
-      context.font = font;
-      let metrics = context.measureText(text);
-      return metrics.width;
-    },
-    getTagBackground: tag =>
-      tag === "" || typeof tag === "object" ? "#F5F5F5cc" : "#F5F5F5",
-    removeTag: (tags, i) => tags.splice(i, 1),
-    emptyTag(i) {
-      this.book.tags[i] = "";
-      document.getElementById("tag-" + i).value = "";
-    },
-    async addTag(tag) {
-      if (!this.book.tags.includes(tag)) {
-        if (this.book.tags[this.book.tags.length - 1] === "") {
-          this.book.tags.pop();
-        }
-        this.book.tags.push(...[tag, ""]);
-        await this.delay(50);
-        document.getElementById("tag-" + (this.book.tags.length - 1)).focus();
-      }
-    },
-    deleteEmptyTags() {
-      for (let i in this.book.tags) {
-        if (this.book.tags[i] === "" && i < this.book.tags.length - 1)
-          this.removeTag(this.book.tags, i);
-      }
-    },
-    async addNewTag(len, e) {
-      this.deleteEmptyTags()
-      if (e.target === document.getElementById("tags-editor")) {
-        if (
-          this.book.tags[len - 1] !== "" &&
-          typeof this.book.tags[len - 1] === "string"
-        ) {
-          this.book.tags.push("");
-          await this.delay(100); //dejemos 100ms para cargar el componente
-          document.getElementById("tag-" + len).focus();
-        } else {
-          document.getElementById("tag-" + (len - 1)).focus();
-        }
-      }
     }
   }
 };
@@ -269,59 +129,7 @@ export default {
           </div>
         </div>
         <textarea v-model="book.synopsis" name="synopsis" placeholder="Sinopsis" id="synopsis"></textarea>
-        <div class="tags">
-          <div id="tags-editor" @click="addNewTag(book.tags.length, $event)">
-            <div
-              class="added-tag-div"
-              v-for="(tag, index) in book.tags"
-              :key="index"
-              :style="{
-                'background-color': getTagBackground(book.tags[index])
-              }"
-            >
-              <input
-                class="added-tag"
-                :id="'tag-' + index"
-                @input.prevent="onTagsInput(index, $event)"
-                v-model="book.tags[index]"
-                placeholder="Escribe una etiqueta"
-                :style="{
-                  width: getTextWidth(book.tags[index], '18px Roboto') + 'px',
-                  background: 'transparent'
-                }"
-              />
-              <div
-                class="icon"
-                @click="
-                  book.tags.length > 1
-                    ? removeTag(book.tags, index)
-                    : emptyTag(index)
-                "
-              >
-                <i class="material-icons">clear</i>
-              </div>
-            </div>
-          </div>
-
-          <div class="tags-suggest">
-            <div class="tag-title">Sugerencias</div>
-            <div
-              class="hint"
-              v-if="this.book.synopsis === '' && this.book.title === ''"
-            >Añade el titulo o una sinopsis para poder encontrar etiquetas</div>
-            <div class="tags-row" v-if="this.book.synopsis !== '' || this.book.title !== ''">
-              <div
-                class="tag"
-                v-bind:key="tag"
-                v-for="tag of this.tagsCoincidences()"
-                @click="addTag(tag)"
-              >
-                {{ tag }}
-                <i class="material-icons">add</i>
-              </div>
-            </div>
-          </div>
-        </div>
+        <tagsEditor :title="book.title" :synopsis="book.synopsis" :tags="book.tags"></tagsEditor>
         <div class="buttons-container">
           <div class="btn cancel">
             <i class="material-icons">arrow_back_ios</i> Cancelar y subir otro libro
@@ -440,7 +248,7 @@ export default {
             width: 100%
             display: flex
             flex-direction: column
-            input, textarea, #select-lang, #tags-editor
+            input, textarea, #select-lang
                 border: none
                 background: transparent
                 background: #F3F3F3
@@ -520,115 +328,7 @@ export default {
                 .menu
                   display: flex
                   flex-direction: column
-            .tags
-              position: relative
-              width: 100%
-              display: flex
-              #tags-editor
-                padding: 10px 20px
-                position: relative
-                width: 100% !important
-                min-height: 50px
-                border-bottom-left-radius: 0;
-                border-bottom-right-radius: 0;
-                flex-direction: row
-                color: transparent;
-                display: flex
-                justify-content: flex-start
-                align-items: flex-start
-                flex-wrap: wrap
-                .added-tag-div
-                  height: 30px;
-                  display: flex
-                  align-items: center
-                  height: 35px
-                  margin: 2.5px
-                  border-radius: 10px
-                  padding: 0 0 !important
-                  width: calc(min-content + 500px)
-                  border-radius: 10px
-                  box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05)
-                  .icon
-                    cursor: pointer;
-                    margin: 0 10px
-                    color: #000000ce
-                    display: flex
-                    align-items: center
-                    transition: color .25s ease-in-out
-                    i
-                      font-size: 18px
-                  .icon:hover
-                    color: black
-                  .added-tag
-                    font-size: 14px
-                    box-shadow: none
-                    color: #000000
-                    width: calc(100% + 20px)
-                    height: 100%
-                    padding: 0
-                    margin: 0 0 0 10px
-                    text-align: center
-                    caret-color: #000000aa
-                  .added-tag::placeholder
-                    color: #000000bb
-
-
-              .tags-suggest
-                position: absolute
-                bottom: 0
-                left: 5px
-                transform: translateY(calc(100% - 5px))
-                height: 50px
-                border-top: 1px solid #d9d9d9
-                display: flex
-                align-items: center
-                width: calc(100% - 10px)
-                box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0,0,0,0.05)
-                background: #F5F5F5
-                border-bottom-left-radius: 10px;
-                border-bottom-right-radius: 10px;
-                padding: 0 25px;
-                .tag-title
-                  font-weight: 500
-                  height: 32px
-                  padding: 0 10px
-                  display: flex
-                  align-items: center
-                  color: #000000f0
-                  border-radius: 10px
-                .tags-row, .hint
-                  margin-left: 10px
-                .hint
-                  opacity: .75
-                .tags-row
-                  width: 100%
-                  height: 100%
-                  display: flex
-                  align-items: center
-                  overflow-x: auto
-                  overflow-y: hidden
-                  flex-wrap: nowrap
-                  .tag
-                    padding: 0 10px
-                    height: 25px
-                    background: #FCFCFC
-                    color: #000000cc
-                    border-radius: 7.5px
-                    margin-right: 7.5px
-                    display: flex
-                    flex: 0 0 auto;
-                    align-items: center
-                    cursor: pointer;
-                    transition: background .25s ease-in-out;
-                    padding: 5 10px
-                    box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05);
-                    i
-                      font-size: 18px
-                      margin-left: 7.5px
-                  .tag:hover
-                    background: #F3F3F3;
-                .tags-row::-webkit-scrollbar
-                  display: none
+            
             .buttons-container
               transform: translateY(100%)
               margin-top: 45px
