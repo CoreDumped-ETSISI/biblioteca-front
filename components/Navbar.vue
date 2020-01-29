@@ -209,7 +209,13 @@ nav > .links > div
 
 .login-btn > a:hover
   text-decoration: none
-
+.btn-user::after
+  content: '';
+  display: block;
+  height: 20px;
+  width: 100%;
+  position: absolute;
+  bottom: -10px;
 .btn-user
   height: 40px
   width: 40px

@@ -2,7 +2,6 @@
 import Book from "../../interfaces/book";
 import axios from "axios";
 import keywords from "../../middleware/keywords";
-
 export default {
   props: {
     book: Book,
@@ -74,7 +73,6 @@ export default {
           this.allTags.push(...keywords.other);
           this.allTags = this.allTags.map(tag => tag.toLowerCase());
           this.allTags = this.deleteDuplicates(this.allTags);
-          console.log(this.allTags);
         })
         .catch(e => {
           this.errors.push(e);
@@ -106,11 +104,9 @@ export default {
           keywords.languages.map(el => el.toLowerCase())
         )
       );
-      console.log(bookKeywords);
 
       suggestions = this.deleteDuplicates(suggestions);
       suggestions = this.deleteHandyAddedTags(suggestions, this.book.tags);
-      console.log(suggestions);
       return suggestions;
     },
     deleteHandyAddedTags: (suggestions, tags) =>
@@ -122,7 +118,6 @@ export default {
       ),
     intersection: (arrayA, arrayB) => arrayA.filter(el => arrayB.includes(el)),
     async onTagsInput(index, event) {
-      console.log(event)
       const tagEl = document.getElementsByClassName("added-tag")[index];
       let innerTag = tagEl.value;
       if (this.book.tags.length > 1 && innerTag === "") {
@@ -133,29 +128,26 @@ export default {
             "deleteByCut"
           ].includes(event.inputType)
         ) {
-          console.warn("deleting tag: " + index);
           if (index > 0) {
             document.getElementById("tag-" + (index - 1)).focus();
           }
           this.removeTag(this.book.tags, index);
-          console.table(this.book.tags);
         }
       } else if (
         innerTag.charAt(innerTag.length - 1) === "," &&
         innerTag.length > 1
       ) {
-        console.log(typeof innerTag)
         this.book.tags[index] = innerTag.replace(",", "").trim();
         if (index === this.book.tags.length - 1) {
           this.book.tags.push([""]);
         }
         tagEl.blur();
-        await this.delay(250);
+        await this.delay(50);
         if (document.getElementById("tag-" + (index + 1)) !== undefined) {
           document.getElementById("tag-" + (index + 1)).focus();
         }
-      } else if (innerTag.charAt(innerTag.length - 1) === ',') {
-        this.book.tags[index] = ''
+      } else if (innerTag.charAt(innerTag.length - 1) === ",") {
+        this.book.tags[index] = "";
       }
     },
 
@@ -171,9 +163,7 @@ export default {
       return metrics.width;
     },
     getTagBackground: tag =>
-      tag === "" || typeof tag === "object"
-        ? "rgba(13, 134, 15, 0.75)"
-        : "rgba(13, 134, 15, 1)",
+      tag === "" || typeof tag === "object" ? "#F5F5F5cc" : "#F5F5F5",
     removeTag: (tags, i) => tags.splice(i, 1),
     emptyTag(i) {
       this.book.tags[i] = "";
@@ -185,7 +175,7 @@ export default {
           this.book.tags.pop();
         }
         this.book.tags.push(...[tag, ""]);
-        await this.delay(250);
+        await this.delay(50);
         document.getElementById("tag-" + (this.book.tags.length - 1)).focus();
       }
     },
@@ -193,6 +183,21 @@ export default {
       for (let i in this.book.tags) {
         if (this.book.tags[i] === "" && i < this.book.tags.length - 1)
           this.removeTag(this.book.tags, i);
+      }
+    },
+    async addNewTag(len, e) {
+      this.deleteEmptyTags()
+      if (e.target === document.getElementById("tags-editor")) {
+        if (
+          this.book.tags[len - 1] !== "" &&
+          typeof this.book.tags[len - 1] === "string"
+        ) {
+          this.book.tags.push("");
+          await this.delay(100); //dejemos 100ms para cargar el componente
+          document.getElementById("tag-" + len).focus();
+        } else {
+          document.getElementById("tag-" + (len - 1)).focus();
+        }
       }
     }
   }
@@ -203,10 +208,7 @@ export default {
   <div id="uploadBox">
     <canvas id="canvas-pdf"></canvas>
     <div class="maxh" id="viewPanel">
-      <div
-        :class="{ 'img-uploaded': this.imageURL !== '' }"
-        class="cover-container"
-      >
+      <div :class="{ 'img-uploaded': this.imageURL !== '' }" class="cover-container">
         <img
           class="cover-default"
           :src="
@@ -216,13 +218,11 @@ export default {
                   '.png')
               : this.imageURL
           "
-          alt=""
+          alt
         />
         <div class="img-uploader-container">
           <div class="book-upload">
-            <i class="material-icons">
-              add_photo_alternate
-            </i>
+            <i class="material-icons">add_photo_alternate</i>
           </div>
           <div class="spacer"></div>
           <div class="menu">
@@ -235,20 +235,8 @@ export default {
     <div class="maxh" id="editPanel">
       <form action="onSubmit()">
         <div class="input-title">
-          <input
-            type="text"
-            name="title"
-            v-model="book.title"
-            placeholder="Titulo"
-            id="title"
-          />
-          <input
-            v-model="book.author"
-            type="text"
-            name="author"
-            placeholder="Autor"
-            id="author"
-          />
+          <input type="text" name="title" v-model="book.title" placeholder="Titulo" id="title" />
+          <input v-model="book.author" type="text" name="author" placeholder="Autor" id="author" />
         </div>
         <div class="input-info">
           <input
@@ -269,12 +257,10 @@ export default {
             <div class="placeholder">
               <div class="val">
                 {{
-                  book.language !== "" ? book.language : "Selecciona un idioma"
+                book.language !== "" ? book.language : "Selecciona un idioma"
                 }}
               </div>
-              <i class="material-icons">
-                arrow_drop_down
-              </i>
+              <i class="material-icons">arrow_drop_down</i>
             </div>
             <div class="menu">
               <div @click="setLang('Español')">Español</div>
@@ -282,14 +268,9 @@ export default {
             </div>
           </div>
         </div>
-        <textarea
-          v-model="book.synopsis"
-          name="synopsis"
-          placeholder="Sinopsis"
-          id="synopsis"
-        ></textarea>
+        <textarea v-model="book.synopsis" name="synopsis" placeholder="Sinopsis" id="synopsis"></textarea>
         <div class="tags">
-          <div id="tags-editor">
+          <div id="tags-editor" @click="addNewTag(book.tags.length, $event)">
             <div
               class="added-tag-div"
               v-for="(tag, index) in book.tags"
@@ -301,8 +282,7 @@ export default {
               <input
                 class="added-tag"
                 :id="'tag-' + index"
-                @input="onTagsInput(index, $event)"
-                @click="deleteEmptyTags"
+                @input.prevent="onTagsInput(index, $event)"
                 v-model="book.tags[index]"
                 placeholder="Escribe una etiqueta"
                 :style="{
@@ -318,27 +298,18 @@ export default {
                     : emptyTag(index)
                 "
               >
-                <i class="material-icons">
-                  clear
-                </i>
+                <i class="material-icons">clear</i>
               </div>
             </div>
           </div>
 
           <div class="tags-suggest">
-            <div class="tag-title">
-              Sugerencias
-            </div>
+            <div class="tag-title">Sugerencias</div>
             <div
               class="hint"
               v-if="this.book.synopsis === '' && this.book.title === ''"
-            >
-              Añade el titulo o una sinopsis para poder encontrar etiquetas
-            </div>
-            <div
-              class="tags-row"
-              v-if="this.book.synopsis !== '' || this.book.title !== ''"
-            >
+            >Añade el titulo o una sinopsis para poder encontrar etiquetas</div>
+            <div class="tags-row" v-if="this.book.synopsis !== '' || this.book.title !== ''">
               <div
                 class="tag"
                 v-bind:key="tag"
@@ -346,12 +317,16 @@ export default {
                 @click="addTag(tag)"
               >
                 {{ tag }}
-                <i class="material-icons">
-                  add
-                </i>
+                <i class="material-icons">add</i>
               </div>
             </div>
           </div>
+        </div>
+        <div class="buttons-container">
+          <div class="btn cancel">
+            <i class="material-icons">arrow_back_ios</i> Cancelar y subir otro libro
+          </div>
+          <div class="btn publish">PUBLICAR</div>
         </div>
       </form>
     </div>
@@ -468,7 +443,7 @@ export default {
             input, textarea, #select-lang, #tags-editor
                 border: none
                 background: transparent
-                background: #e6e6e6
+                background: #F3F3F3
                 border: none
                 border-radius: 15px
                 padding: 0 25px
@@ -503,7 +478,6 @@ export default {
             #select-lang
                 position: relative
                 width: 28%
-
                 .placeholder
                   width: 100%
                   height: 100%
@@ -531,7 +505,7 @@ export default {
                   transform: translateY(calc(100% + 7.5px))
                   width: 100%
                   border-radius: 15px
-                  background: #e6e6e6
+                  background: #F3F3F3
                   box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0,0,0,0.05)
                   cursor: pointer
                   div
@@ -570,7 +544,6 @@ export default {
                   height: 35px
                   margin: 2.5px
                   border-radius: 10px
-                  color: red
                   padding: 0 0 !important
                   width: calc(min-content + 500px)
                   border-radius: 10px
@@ -578,26 +551,26 @@ export default {
                   .icon
                     cursor: pointer;
                     margin: 0 10px
-                    color: #ffffffce
+                    color: #000000ce
                     display: flex
                     align-items: center
                     transition: color .25s ease-in-out
                     i
                       font-size: 18px
                   .icon:hover
-                    color: white
+                    color: black
                   .added-tag
                     font-size: 14px
                     box-shadow: none
-                    color: white
+                    color: #000000
                     width: calc(100% + 20px)
                     height: 100%
                     padding: 0
                     margin: 0 0 0 10px
                     text-align: center
-                    caret-color: #ffffffaa
+                    caret-color: #000000aa
                   .added-tag::placeholder
-                    color: #ffffffcc
+                    color: #000000bb
 
 
               .tags-suggest
@@ -611,16 +584,16 @@ export default {
                 align-items: center
                 width: calc(100% - 10px)
                 box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0,0,0,0.05)
-                background: #e8e8e8
+                background: #F5F5F5
                 border-bottom-left-radius: 10px;
                 border-bottom-right-radius: 10px;
                 padding: 0 25px;
                 .tag-title
+                  font-weight: 500
                   height: 32px
                   padding: 0 10px
                   display: flex
                   align-items: center
-                  background: #0000001c
                   color: #000000f0
                   border-radius: 10px
                 .tags-row, .hint
@@ -629,6 +602,7 @@ export default {
                   opacity: .75
                 .tags-row
                   width: 100%
+                  height: 100%
                   display: flex
                   align-items: center
                   overflow-x: auto
@@ -637,8 +611,8 @@ export default {
                   .tag
                     padding: 0 10px
                     height: 25px
-                    background: #0D860F
-                    color: white
+                    background: #FCFCFC
+                    color: #000000cc
                     border-radius: 7.5px
                     margin-right: 7.5px
                     display: flex
@@ -647,13 +621,43 @@ export default {
                     cursor: pointer;
                     transition: background .25s ease-in-out;
                     padding: 5 10px
+                    box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05);
                     i
                       font-size: 18px
                       margin-left: 7.5px
                   .tag:hover
-                    background: #0b740d;
-
-
+                    background: #F3F3F3;
                 .tags-row::-webkit-scrollbar
                   display: none
+            .buttons-container
+              transform: translateY(100%)
+              margin-top: 45px
+              display: flex
+              justify-content: flex-end
+              align-items: center
+              .btn
+                height: 50px
+                display: flex
+                align-items: center
+                justify-content: center
+                cursor: pointer
+                color: #0d860f
+                padding: 0 30px
+                border-radius: 25px
+                transition: all .25s ease-in-out
+              .btn.publish
+                font-size: 20px
+                border: 2px solid #0d860f
+                color: white
+                background: #0d860f
+                font-weight: bold
+                margin-left: 10px
+                box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05);
+              .btn.publish:hover
+                color: white
+              .btn.cancel
+                color: black
+                opacity: .7
+                i.material-icons
+                  color: #494949
 </style>
