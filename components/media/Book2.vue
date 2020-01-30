@@ -54,6 +54,7 @@ export default {
                 'en':{'variant':'warning', 'name':'Inglés'}},
             statuses: ['pending', 'accepted', 'denied', 'erased'],
             selected: this.status,
+            librosString: ['libro1.png', 'libro2.png', 'libro3.png', 'libro4.png'],
             options: [
 							{ item: 'pending', text: 'Status: pending' },
 							{ item: 'accepted', text: 'Status: accepted' },
@@ -64,6 +65,9 @@ export default {
     },
     computed: {
       getBookWithImage() {
+        if(this.imageFormat == '')
+          return 'http://localhost:3003/'+this.librosString[Math.floor(Math.random() * this.librosString.length)]
+        
         return 'http://localhost:3003/'+this.sha1+'.'+this.imageFormat
       },
       getTag(){

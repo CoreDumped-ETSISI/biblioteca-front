@@ -226,6 +226,10 @@
            console.log(this.file);
             let formData = new FormData();
 
+            var myImageFormat = ''
+            if(this.image != '')
+              myImageFormat = this.image.name.split('.')[1]
+
             let data = {
               title: this.title,
               author: this.author,
@@ -234,7 +238,7 @@
               publisher: this.publisher,
               tags: this.getTags,
               size: this.file.size,
-              imageFormat: this.image.name.split('.')[1],
+              imageFormat: myImageFormat,
               language: this.selectedLanguage
             }
 
@@ -255,7 +259,10 @@
               console.log(response)
               console.log('SUCCESS BOOK!!');
               console.log(response.data.message.sha1)
-              localThis.uploadImage(response.data.message.sha1)
+              if(localThis.image != '')
+                localThis.uploadImage(response.data.message.sha1)
+              else
+                localThis.changePage()
             })
             .catch(function(err){
               console.log(err)
