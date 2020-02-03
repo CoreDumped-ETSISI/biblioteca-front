@@ -2,7 +2,13 @@
   <div>
     <topnavbar :logged="true"></topnavbar>
     <uploadBook v-on:file="extractMeta" v-if="!this.accepted"></uploadBook>
-    <editMetadata v-bind:book="this.book" :file="this.file" v-if="this.accepted"></editMetadata>
+    <editMetadata
+      @onUploadBook="uploadBook"
+      @cancelUpload="cancelUpload"
+      v-bind:book="this.book"
+      :file="this.file"
+      v-if="this.accepted"
+    ></editMetadata>
   </div>
 </template>
 
@@ -137,147 +143,133 @@
 !-->
 
 <script>
-  import axios from 'axios';
-  import topnavbar from '../components/Navbar.vue';
-  import uploadBook from '../components/upload/upload_book';
-  import editMetadata from '../components/upload/edit_metadata';
-  import Book from '../interfaces/book'
+import axios from "axios";
+import topnavbar from "../components/Navbar.vue";
+import uploadBook from "../components/upload/upload_book";
+import editMetadata from "../components/upload/edit_metadata";
+import Book from "../interfaces/book";
 
-  export default {
-    middleware: 'auth',
-    components: {
-      topnavbar,
-      uploadBook,
-      editMetadata
+export default {
+  middleware: "auth",
+  components: {
+    topnavbar,
+    uploadBook,
+    editMetadata
+  },
+  data() {
+    return {
+      file: {},
+      book: new Book({}),
+      accepted: false
+    };
+  },
+  computed: {
+    getTags() {
+      var tagArr = this.tags.split(",");
+      for (var i = 0; i < tagArr.length; i++) tagArr[i] = tagArr[i].trim();
+      if (tagArr[tagArr.length - 1] === "") tagArr.pop();
+      return tagArr;
+    }
+  },
+
+  methods: {
+    cancelUpload() {
+      this.file = {};
+      this.book = new Book({});
+      this.accepted = false;
     },
-    data() {
-      return {
-        file: {},
-        book: new Book({}),
-        accepted: false
-      }
-    },
-    computed: {
-      getTags() {
-        var tagArr = this.tags.split(",")
-        for (var i = 0; i < tagArr.length; i++)
-          tagArr[i] = tagArr[i].trim()
-        if (tagArr[tagArr.length - 1] === "")
-          tagArr.pop();
-        return tagArr;
-      }
+    changePage() {
+      console.log("Hey");
+      this.$router.push({
+        path: "/bookCatalogue"
+      });
     },
 
-    methods: {
-      changePage() {
-        console.log("Hey")
-        this.$router.push({
-          path: '/bookCatalogue'
+    getData() {
+      console.log(this.$route.params.name);
+    },
+
+    extractMeta(file) {
+      this.file = file;
+      let formData = new FormData();
+
+      formData.append("book", file);
+
+      axios
+        .post("http://192.168.0.104:3003/book/getMetadata", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
         })
-      },
+        .then(response => {
+          console.log(response.data);
+          const book = new Book(response.data);
+          this.book = book;
+          this.book.format = this.book.filename.split(".").pop();
+          this.book.size = file.size;
+          this.accepted = true;
+        })
+        .catch(err => {
+          this.accepted = false;
+          console.log(err);
+          console.log("FAILURE!!");
+        });
+    },
+    uploadBook(bookObject) {
+      const book = bookObject.book;
+      const imageFile = bookObject.imageFile;
+      console.log(JSON.stringify(book));
+      let formData = new FormData();
+      formData.append("book", this.file);
+      formData.append("data", JSON.stringify(book));
 
-      getData() {
-        console.log(this.$route.params.name)
-      },
+      axios
+        .post("http://192.168.0.104:3003/book/uploadBook", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        })
+        .then(res => {
+          console.log(res);
+          console.log(
+            "%c Book uploaded successfully",
+            "color: #00ff00, font-size: 16px"
+          );
+          console.log(res.data.message.sha1);
+          this.uploadImage(imageFile, res.data.message.sha1);
+        })
+        .catch(err => {
+          console.warn("Error on book upload");
+          console.warn(err);
+        });
+    },
+    uploadImage(image, sha1) {
+      let formData = new FormData();
+      const name = "imageFromPdf-" + new Date().getTime() + ".png";
 
-      extractMeta(file) {
-        this.file = file;
-        let formData = new FormData();
+      const data = { sha1 };
+      formData.append("image", image, name);
+      formData.append("data", JSON.stringify(data));
 
-        formData.append('book', file);
-
-        axios.post('http://localhost:3003/book/getMetadata',
-            formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            }
-          ).then(response => {
-            console.log(response.data)
-            const book = new Book(response.data);
-            this.book = book;
-            this.book.format = this.book.filename.split('.').pop();
-            this.book.size = file.size;
-            this.accepted = true;
-            console.log(this.book);
-/*
-            localThis.author = response.data.author
-            localThis.title = response.data.title
-            localThis.synopsis = response.data.synopsis
-            localThis.publisher = response.data.publisher
-            localThis.date = response.data.publishDate
-            if (response.data.language != null && ["en", "es"].includes(response.data.language)) {
-              console.log("Language is " + response.data.language)
-              localThis.selectedLanguage = response.data.language
-            }
-            localThis.selectedLanguage
-            localThis.isVisible = true
-            localThis.loaderVisible = false
-            console.log('SUCCESS!!');*/
-          })
-          .catch(err => {
-            this.accepted = false;
-            console.log(err);
-            console.log('FAILURE!!');
-          });
-      },
-
-    /*  submitFile() {
-        this.buttonsLoading = true;
-        let localThis = this
-        console.log(this.file);
-        let formData = new FormData();
-
-        let data = {
-          title: this.title,
-          author: this.author,
-          synopsis: this.synopsis,
-          date: this.date,
-          publisher: this.publisher,
-          tags: this.getTags,
-          size: this.file.size,
-          imageFormat: this.image.name.split('.')[1],
-          language: this.selectedLanguage
-        }
-
-        formData.append('book', this.file);
-        formData.append('data', JSON.stringify(data));
-
-        console.log(formData);
-
-
-        axios.post('http://localhost:3003/book/uploadBook',
-            formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            }
-          ).then(function (response) {
-            console.log(response)
-            console.log('SUCCESS BOOK!!');
-            console.log(response.data.message.sha1)
-            localThis.uploadImage(response.data.message.sha1)
-          })
-          .catch(function (err) {
-            console.log(err)
-            console.log('FAILURE!!');
-          });
-      },
-
-      fileChange() {
-        this.isVisible = false
-        this.image = ''
-        this.imagebuttonsLoading = false
-        this.imageauthor = ""
-        this.imagetitle = ""
-        this.imagepublisher = ""
-        this.imagedate = null
-        this.imagesynopsis = ""
-        this.imageisVisible = false
-        this.imageloaderVisible = false
-        this.imageselectedLanguage = "en"
-      },
-
+      axios
+        .post("http://192.168.0.104:3003/book/uploadImage", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        })
+        .then(res => {
+          console.log(res);
+          console.log(
+            "%c Book Cover uploaded successfully",
+            "color: #00ff00, font-size: 16px"
+          );
+        })
+        .catch(err => {
+          console.log("Error uploading cover!!");
+          console.log(err);
+        });
+    }
+    /*  
       uploadImage(sha1) {
         let localThis = this
         console.log(this.file);
@@ -293,7 +285,7 @@
         console.log(formData);
 
 
-        axios.post('http://localhost:3003/book/uploadImage',
+        axios.post('http://192.168.0.104:3003/book/uploadImage',
             formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
@@ -314,14 +306,12 @@
       handleFileUpload() {
         this.file = this.$refs.file.files[0];
       }*/
-    }
   }
-
+};
 </script>
 
 <style>
-  #collapse-1 {
-    margin: 20px;
-  }
-
+#collapse-1 {
+  margin: 20px;
+}
 </style>

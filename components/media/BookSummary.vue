@@ -1,29 +1,35 @@
 <template>
   <div class="book-open">
     <div class="close-summary" v-on:click="closeBook"></div>
-    <div class="book-summary" v-bind:style="this.animation">
-      <div class="book-summary-inner">
+    <div
+      id="book-summary"
+      class="book-summary"
+      v-bind:style="{ transform: this.animation.transform }"
+    >
+      <div class="book-summary-inner" v-bind:style="this.animationX">
         <div class="book-cover">
           <img :src="getBookWithImage" />
-          <div class="download">
-            <i class="material-icons">cloud_download</i> Descargar
-          </div>
-          <div class="info">
-            <div>
-              <i class="material-icons">sd_storage</i>
-              <div><b>Tamaño:</b> {{ getUnits }}</div>
+          <div class="book-info">
+            <div class="download">
+              <i class="material-icons">cloud_download</i> Descargar
             </div>
-            <div>
-              <i class="material-icons">language</i>
-              <div><b>Idioma:</b> {{ getTag.name }}</div>
-            </div>
-            <div>
-              <i class="material-icons">access_time</i>
-              <div><b>Fecha de subida:</b> {{ getDate }}</div>
-            </div>
-            <div>
-              <i class="material-icons">attachment</i>
-              <div><b>Formato:</b> {{ book.format }}</div>
+            <div class="info">
+              <div>
+                <i class="material-icons">sd_storage</i>
+                <div><b>Tamaño:</b> {{ getUnits }}</div>
+              </div>
+              <div>
+                <i class="material-icons">language</i>
+                <div><b>Idioma:</b> {{ getTag.name }}</div>
+              </div>
+              <div>
+                <i class="material-icons">access_time</i>
+                <div><b>Fecha de subida:</b> {{ getDate }}</div>
+              </div>
+              <div>
+                <i class="material-icons">attachment</i>
+                <div><b>Formato:</b> {{ book.format }}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -33,12 +39,12 @@
             <div class="author">{{ book.author }}</div>
             <div class="publisher">{{ book.publisher }}</div>
           </div>
-          <hr>
+          <hr />
           <div class="synopsis">{{ book.synopsis }}</div>
         </div>
         <div class="book-tags">
           <div class="tag" v-for="tag of book.tags" v-bind:key="tag">
-            <div> {{ tag }} </div>
+            <div>{{ tag }}</div>
             <i class="material-icons">
               search
             </i>
@@ -50,338 +56,525 @@
 </template>
 
 <script>
-  import axios from "axios";
-  import moment from "moment";
+import axios from "axios";
+import moment from "moment";
 
-  export default {
-    data() {
-      return {
-        animation: { transform: 'none' },
-        description: "Descripción por defecto, quizá demasiado corta",
-        imageSrc: "http://localhost:3003/" + this.sha1 + "." + this.imageFormat,
-        downloads: [{
-            type: "PDF",
-            url: "#"
-          },
-          {
-            type: "EPUB",
-            url: "#"
-          },
-          {
-            type: "GBA",
-            url: "#"
-          }
-        ],
-        languages: {
-          es: {
-            variant: "danger",
-            name: "Español"
-          },
-          en: {
-            variant: "warning",
-            name: "Inglés"
-          }
+export default {
+  data() {
+    return {
+      book: this.selectedBook.book,
+      animation: { transform: "none" },
+      animationX: { transform: "none" },
+      description: "Descripción por defecto, quizá demasiado corta",
+      imageSrc:
+        "http://192.168.0.104:3003/" + this.sha1 + "." + this.imageFormat,
+      downloads: [
+        {
+          type: "PDF",
+          url: "#"
         },
-        statuses: ["pending", "accepted", "denied", "erased"],
-        selected: this.status,
-        options: [{
-            item: "pending",
-            text: "Status: pending"
-          },
-          {
-            item: "accepted",
-            text: "Status: accepted"
-          },
-          {
-            item: "denied",
-            text: "Status: denied"
-          },
-          {
-            item: "erased",
-            text: "Status: erased"
-          }
-        ]
-      };
+        {
+          type: "EPUB",
+          url: "#"
+        },
+        {
+          type: "GBA",
+          url: "#"
+        }
+      ],
+      languages: {
+        es: {
+          variant: "danger",
+          name: "Español"
+        },
+        en: {
+          variant: "warning",
+          name: "Inglés"
+        }
+      },
+      statuses: ["pending", "accepted", "denied", "erased"],
+      selected: this.status,
+      options: [
+        {
+          item: "pending",
+          text: "Status: pending"
+        },
+        {
+          item: "accepted",
+          text: "Status: accepted"
+        },
+        {
+          item: "denied",
+          text: "Status: denied"
+        },
+        {
+          item: "erased",
+          text: "Status: erased"
+        }
+      ],
+      touchXi: 0,
+      touchYi: 0,
+      touchXf: 0,
+      touchYf: 0,
+      gestureContainer: {}
+    };
+  },
+  mounted() {
+    this.listenContainerGesture();
+  },
+  watch: {
+    selectedBook: function(){ this.book = this.selectedBook.book }
+  },
+  computed: {
+    getBookWithImage() {
+      return (
+        "http://192.168.0.104:3003/" +
+        this.book.sha1 +
+        "." +
+        this.book.imageFormat
+      );
     },
-    computed: {
-      getBookWithImage() {
-        return (
-          "http://localhost:3003/" + this.book.sha1 + "." + this.book.imageFormat
-        );
-      },
-      getTag() {
-        return this.languages[this.book.language];
-      },
-      getUnits() {
-        var bytes = this.book.size;
-        var decimals = 2;
-        if (bytes === 0) return "0 Bytes";
+    getTag() {
+      return this.languages[this.book.language];
+    },
+    getUnits() {
+      var bytes = this.book.size;
+      var decimals = 2;
+      if (bytes === 0) return "0 Bytes";
 
-        const k = 1024;
-        const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
 
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-      },
-      getDate() {
-        moment.locale("es");
-        return moment(String(this.book.uploadDate)).format("DD/MM/YYYY hh:mm");
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+    },
+    getDate() {
+      moment.locale("es");
+      return moment(String(this.book.uploadDate)).format("DD/MM/YYYY hh:mm");
+    },
+    
+  },
+  props: ['selectedBook'],
+  methods: {
+    async listenContainerGesture() {
+      await this.delay(150);
+      this.gestureContainer = document.getElementById("book-summary");
+      this.gestureContainer.addEventListener(
+        "touchstart",
+        e => {
+          this.touchXi = e.targetTouches[0].screenX;
+          this.touchXf = this.touchXi;
+          this.touchYi = e.targetTouches[0].screenY;
+        },
+        false
+      );
+
+      this.gestureContainer.addEventListener(
+        "touchmove",
+        async e => {
+          this.touchYf = e.changedTouches[0].screenY;
+          await this.handleGesture(true);
+        },
+        false
+      );
+
+      this.gestureContainer.addEventListener(
+        "touchend",
+        async e => {
+          this.touchXf = e.changedTouches[0].screenX;
+          await this.handleGesture(false);
+        },
+        false
+      );
+    },
+    async closeBook(mobile = false) {
+      if (mobile) {
+        this.animation = { transform: "translateY(100%)" };
+      } else {
+        this.animation = { transform: "translateY(calc(100% + 300px))" };
       }
+      await this.delay(350);
+      this.$emit("close", "close");
+      this.animation = { transform: "none" };
     },
-    props: {
-      book: Object
+    async delay(ms) {
+      return new Promise(r => setTimeout(r, ms));
     },
-
-    methods: {
-      async closeBook() {
-        this.animation = { transform: 'translateY(calc(100% + 300px))' };
-        await this.delay(250);
-        this.$emit("close", "close");
-        this.animation = { transform: 'none' };
-      },
-      async delay(ms) {
-        return new Promise(r => setTimeout(r, ms))
-      },
-      onChange() {
-        console.log(this.selected);
-        axios
-          .put(`http://localhost:3003/book/` + this.id, {
-            status: this.selected
-          })
-          .then(response => {
-            console.log(response);
-          })
-          .catch(e => {
-            this.errors.push(e);
-            console.log("error");
-          });
-      },
-      download() {
-        let url = "http://localhost:3003/book/download/" + this.book.filename;
-        axios({
-            url: url,
-            method: "GET",
-            responseType: "blob" // important
-          })
-          .then(response => {
-            console.log(response);
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute(
-              "download",
-              this.book.title + "-" + this.book.author + "." + this.book.format
-            ); //or any other extension
-            document.body.appendChild(link);
-            link.click();
-          })
-          .catch(function (err) {
-            console.log(err);
-            console.log("FAILURE!!");
-          });
+    onChange() {
+      axios
+        .put(`http://192.168.0.104:3003/book/` + this.id, {
+          status: this.selected
+        })
+        .then(response => {
+          console.log(response);
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("error");
+        });
+    },
+    download() {
+      let url = "http://192.168.0.104:3003/book/download/" + this.book.filename;
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob" // important
+      })
+        .then(response => {
+          console.log(response);
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute(
+            "download",
+            this.book.title + "-" + this.book.author + "." + this.book.format
+          ); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch(function(err) {
+          console.log(err);
+          console.log("FAILURE!!");
+        });
+    },
+    async handleGesture(posY) {
+      if (
+        posY &&
+        (Math.abs(this.touchXi - this.touchXf) <
+          Math.abs(this.touchYi - this.touchYf) ||
+          Math.abs(this.touchYi - this.touchYf) > 100)
+      ) {
+        if (this.touchYf > this.touchYi) {
+          const distance = this.touchYf - this.touchYi;
+          if (distance > 100) {
+            this.closeBook(true);
+          } else {
+            this.animation = { transform: `translateY(${distance}px)` };
+            await this.delay(350);
+            this.animation = { transform: `none` };
+          }
+        }
+      } else if (!posY) {
+        if (Math.abs(this.touchXi - this.touchXf) > 90) {
+          if (this.touchXf < this.touchXi && this.selectedBook.i < (this.selectedBook.len - 1)) {
+            this.animationX = {
+              transform: `translate(-100%, 0)`,
+              opacity: 0.1
+            };
+            this.animation = {
+              transform: "translate(0)"
+            };
+              await this.delay(175);
+            this.$emit("changeBook", { book: this.book, next: true });
+            this.animationX = {
+              transition: "unset",
+              transform: `translate(100%, 0)`,
+            };
+            await this.delay(25);
+            this.animationX = {
+              transform: `translate(93%, 0)`,
+              opacity: 1
+            };
+            await this.delay(100);
+            this.animationX = {};
+          } else if (this.selectedBook.i > 0 && this.touchXf > this.touchXi) {
+            this.animationX = {
+              transform: `translate(100%, 0)`,
+              opacity: 0.1
+            };
+            this.animation = {
+              transform: "translate(0)"
+            };
+            await this.delay(175);
+            this.$emit("changeBook", { book: this.book, next: false });
+            this.animationX = {
+              transition: "unset",
+              transform: `translate(-100%, 0)`,
+            };
+            await this.delay(25);
+            this.animationX = {
+              transform: `translate(-93%, 0)`,
+              opacity: 1
+            };
+            await this.delay(100)
+            this.animationX = {};
+          }
+        } else {
+          this.animationX = {
+            transform: `translate(${this.touchXf - this.touchXi}px, 0)`
+          };
+          await this.delay(350);
+          this.animationX = { transform: `none` };
+        }
+        this.touchXf = 0;
+        this.touchXi = 0;
       }
     }
-  };
-
+  }
+};
 </script>
 
 <style scoped>
+.book-open {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  background: radial-gradient(#0000001d, #00000020);
+}
+
+.book-open > .close-summary {
+  height: 60vh;
+  width: 100vw;
+  cursor: pointer;
+}
+
+.book-open > .book-summary {
+  height: 40vh;
+  width: 100vw;
+  background: white;
+  transition: all 0.35s ease-in-out;
+  animation: appear-in 0.25s ease-in-out;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0px 3px 6px 2px rgba(255, 255, 255, 0.03),
+    0 3px 6px rgba(255, 255, 255, 0.05);
+}
+
+.book-open > .book-summary > .book-summary-inner {
+  display: flex;
+  justify-content: flex-start;
+  padding: 50px 5vw;
+  transition: all 0.35s ease-in-out;
+}
+
+.book-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: space-between;
+  transform: translateY(calc(-50% - 50px));
+  max-width: 270px;
+  align-items: center;
+}
+
+.book-cover > .book-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.book-cover img {
+  margin-bottom: 25px;
+  width: 270px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 30px 30px 80px rgba(55, 84, 170, 0.1),
+    -30px -30px 80px rgba(255, 255, 255, 1),
+    inset 4px 4px 20px rgba(255, 255, 255, 0.5);
+}
+
+.book-cover > .book-info > .info {
+  opacity: 0.75;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+.book-cover > .book-info > .info > div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.book-cover > .book-info > .info > div > div {
+  text-overflow: ellipsis;
+}
+
+.book-cover > .book-info > .info > div > i {
+  margin-right: 10px;
+  font-size: 24px;
+}
+
+.book-cover .download {
+  margin-bottom: 15px;
+  width: min-content;
+  padding: 0 20px;
+  color: #0d860f;
+  font-weight: bold;
+  border: 2px solid #0d860f;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  transition: all 0.25s ease-in-out;
+  cursor: pointer;
+}
+
+.book-cover .download:hover {
+  background: #0d860f;
+  color: white;
+}
+
+.book-cover .download i {
+  margin-right: 10px;
+}
+
+.book-description {
+  margin-left: 50px;
+}
+
+.book-description > .book-title {
+  font-size: 28px;
+}
+
+.book-description > .info {
+  display: flex;
+  opacity: 0.85;
+}
+
+.book-description > .info > div:first-child {
+  margin-right: 10px;
+}
+
+.book-description > .info > div:first-child::before {
+  display: inline;
+  content: "Autor: ";
+  font-weight: bold;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.book-description > .info > div:last-child::before {
+  display: inline;
+  content: "· Editorial: ";
+  font-weight: bold;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.book-description > .synopsis {
+  width: 40vw;
+  margin-top: 20px;
+}
+
+.book-description > .synopsis::before {
+  content: "Sinopsis: ";
+  display: inline;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.book-tags {
+  margin-left: 20px;
+  display: flex;
+  justify-content: flex-start;
+  align-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.book-tags > .tags {
+  font-size: 18px;
+}
+
+.book-tags > .tag {
+  background: #0d860f;
+  color: white;
+  border-radius: 2px;
+  margin: 0 2.5px 10px;
+  padding: 12px 15px;
+  font-size: 13px;
+  height: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.book-tags > .tag i {
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+@keyframes appear-in {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes appear-out {
+  from {
+    transform: translateY(0%);
+  }
+
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  body {
+    overscroll-behavior-y: contain;
+    overflow: none;
+    touch-action: none;
+  }
   .book-open {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
+    overscroll-behavior-y: contain;
+  }
+  .close-summary {
+    display: none;
+  }
+  .book-summary {
+    height: 100% !important;
+    overflow: auto;
+    overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
+    touch-action: none;
+  }
+  .book-summary > .book-summary-inner {
+    height: 100%;
     flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    background: radial-gradient(#0000001d, #00000020);
   }
-
-  .book-open>.close-summary {
-    height: 60vh;
-    width: 100vw;
-    cursor: pointer;
-  }
-
-  .book-open>.book-summary {
-    height: 40vh;
-    width: 100vw;
-    background: white;
-    transition: all .25s ease-in-out;
-    animation: appear-in 0.25s ease-in-out;
-    border-radius: 20px 20px 0 0;
-    box-shadow: 0px 3px 6px 2px rgba(255, 255, 255, 0.03),
-      0 3px 6px rgba(255, 255, 255, 0.05);
-  }
-
-  .book-open>.book-summary>.book-summary-inner {
-    display: flex;
-    justify-content: flex-start;
-    padding: 50px 5vw;
-  }
-
   .book-cover {
-    display: flex;
-    flex-direction: column;
-    align-items: space-between;
-    transform: translateY(calc(-50% - 50px));
-    max-width: 270px;
-    align-items: center;
+    flex-direction: row;
+    transform: unset;
+    max-width: 100%;
   }
-
   .book-cover img {
-    margin-bottom: 25px;
-    width: 270px;
-    height: auto;
-    border-radius: 10px;
-    box-shadow: 30px 30px 80px rgba(55, 84, 170, 0.1),
-      -30px -30px 80px rgba(255, 255, 255, 1),
-      inset 4px 4px 20px rgba(255, 255, 255, 0.5);
+    width: 150px;
+    margin: 0 15px 15px 0;
   }
-
-  .book-cover>.info {
-    opacity: 0.75;
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
+  .book-cover .book-info {
+    flex-direction: column-reverse;
   }
-
-  .book-cover>.info>div {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
+  .download {
+    margin: 15px 0;
   }
-
-  .book-cover>.info>div>div {
-    text-overflow: ellipsis;
+  .info b {
+    display: none;
   }
-
-  .book-cover>.info>div>i {
-    margin-right: 10px;
+  .book-description {
+    margin: 10px 0;
+  }
+  .book-description > .book-title {
     font-size: 24px;
   }
-
-  .book-cover .download {
-    margin-bottom: 15px;
-    width: min-content;
-    padding: 0 20px;
-    color: #0d860f;
-    font-weight: bold;
-    border: 2px solid #0d860f;
-    border-radius: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 40px;
-    transition: all 0.25s ease-in-out;
-    cursor: pointer;
-  }
-
-  .book-cover .download:hover {
-    background: #0d860f;
-    color: white;
-  }
-
-  .book-cover .download i {
-    margin-right: 10px;
-  }
-
-  .book-description {
-    margin-left: 50px;
-  }
-
-  .book-description>.book-title {
-    font-size: 28px;
-  }
-
-  .book-description>.info {
-    display: flex;
-    opacity: .85;
-  }
-
-  .book-description>.info>div:first-child {
-    margin-right: 10px;
-  }
-
-  .book-description>.info>div:first-child::before {
-    display: inline;
-    content: 'Autor: ';
-    font-weight: bold;
-    font-size: 13px;
-    text-transform: uppercase;
-  }
-
-  .book-description>.info>div:last-child::before {
-    display: inline;
-    content: '· Editorial: ';
-    font-weight: bold;
-    font-size: 13px;
-    text-transform: uppercase;
-  }
-
-  .book-description>.synopsis {
-    width: 40vw;
-    margin-top: 20px;
-  }
-
-  .book-description>.synopsis::before {
-    content: 'Sinopsis: ';
-    display: inline;
-    font-size: 13px;
-    font-weight: bold;
-  }
-
-  .book-tags {
-    margin-left: 20px;
-    display: flex;
-    justify-content: flex-start;
-    align-content: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .book-tags>.tags {
-    font-size: 18px;
-  }
-
-  .book-tags>.tag {
-    background: #0d860f;
-    color: white;
-    border-radius: 2px;
-    margin: 0 2.5px 10px;
-    padding: 12px 15px;
-    font-size: 13px;
-    height: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .book-tags>.tag i {
-    margin-left: 10px;
+  .book-description > .info {
     font-size: 14px;
   }
-
-  @keyframes appear-in {
-    from {
-      transform: translateY(100%);
-    }
-
-    to {
-      transform: translateY(0%);
-    }
+  .book-description > .synopsis {
+    width: 100%;
   }
-
-  @keyframes appear-out {
-    from {
-      transform: translateY(0%);
-    }
-
-    to {
-      transform: translateY(100%);
-    }
+  .book-tags {
+    margin: 25px 0 88px;
   }
-
+}
 </style>

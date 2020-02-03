@@ -1,6 +1,11 @@
 <template>
   <section>
-    <bookSummary v-if="selectedBook !== undefined" v-bind:book="selectedBook" v-on:close="selectBook($event)"></bookSummary>
+    <bookSummary
+      v-if="selectedBook !== undefined"
+      v-bind:selectedBook="selectedBook"
+      v-on:close="selectBook($event)"
+      @changeBook="changeBook"
+    ></bookSummary>
     <div id="library">
       <div class="lowMargin">
         <div class="title">
@@ -9,7 +14,7 @@
 
         <div class="books">
           <book
-            v-for="post of currentPosts"
+            v-for="post in search.query.length === 0 ? posts : filteredBooks"
             v-on:selectBook="selectBook($event)"
             v-bind:key="post.id"
             :book="post"
@@ -43,8 +48,6 @@ export default {
       return this.posts.length;
     },
     currentPosts() {
-      console.log((this.currentPage - 1) * this.perPage);
-      console.log((this.currentPage - 1) * this.perPage + this.perPage);
       return this.posts.slice(
         (this.currentPage - 1) * this.perPage,
         (this.currentPage - 1) * this.perPage + this.perPage
@@ -52,21 +55,75 @@ export default {
     }
   },
   methods: {
-    selectBook(book) {
-      if(book !== 'close') {
-        console.log(book);
-        this.selectedBook = book; 
+    changeBook(e) {
+      const i = this.posts.map(el => el._id).indexOf(e.book._id);
+      if (e.next) {
+        if (i + 1 < this.posts.length) {
+          this.selectBook(this.posts[i + 1], i + 1);
+        }
       } else {
-        this.selectedBook = undefined;  
+        if (i > 0) {
+          this.selectBook(this.posts[i - 1], i - 1);
+        }
+      }
+    },
+    selectBook(
+      book,
+      i = book === "close" ? -1 : this.posts.map(el => el._id).indexOf(book._id)
+    ) {
+      const len = this.posts.length;
+      if (book !== "close") {
+        this.selectedBook = { book, i, len };
+      } else {
+        this.selectedBook = undefined;
+      }
+    },
+    intersection: (arrayA, arrayB) => arrayA.filter(el => arrayB.includes(el))
+  },
+  watch: {
+    search: function() {
+      if (this.search.query !== "") {
+        this.filteredBooks = this.posts.filter(book => {
+          if (this.search.params.every(el => !el.active)) {
+            this.search.params[0].active = true;
+          }
+          for (const param of this.search.params) {
+            if (param.key !== "tags") {
+              if (
+                param.active &&
+                book[param.key]
+                  .toLowerCase()
+                  .includes(this.search.query.toLowerCase())
+              ) {
+                return true;
+              }
+            } else {
+              if (
+                this.intersection(
+                  book.tags.map(el => (el = el.toLowerCase())),
+                  this.search.query
+                    .split(/[\s,]/g)
+                    .map(el => (el = el.toLowerCase()))
+                ).length > 0
+              ) {
+                return true;
+              }
+            }
+          }
+          return false;
+        });
+      } else {
+        this.filteredBooks = this.posts;
       }
     }
   },
-
+  props: ["search"],
   data() {
     return {
       perPage: 6,
       currentPage: 1,
       posts: [],
+      filteredBooks: [],
       errors: [],
       selectedBook: undefined
     };
@@ -77,7 +134,7 @@ export default {
       headers: { Authorization: "Bearer " + localStorage.getItem("user-token") }
     };
     axios
-      .get(`http://localhost:3003/book/getAllBooks`, config)
+      .get(`http://192.168.0.104:3003/book/getAllBooks`, config)
       .then(response => {
         this.posts = response.data.books.sort(function(a, b) {
           return new Date(b.uploadDate) - new Date(a.uploadDate);
@@ -90,7 +147,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 section {
   width: 100%;
   min-height: calc(100vh - 68px);
@@ -114,5 +171,15 @@ section {
   display: grid;
   grid-template-columns: repeat(auto-fill, 220px);
   grid-gap: 50px;
+  justify-content: center;
+}
+
+@media screen and (max-width: 768px) {
+  .books {
+    grid-template-columns: repeat(auto-fill, 125px);
+  }
+  .title {
+    margin: 30px 0;
+  }
 }
 </style>

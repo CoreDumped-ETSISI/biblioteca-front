@@ -1,26 +1,5 @@
 <template>
   <div>
-    <!--
-  <b-navbar toggleable="lg" type="dark" variant="success">
-    <b-navbar-brand href="/">Coreteca</b-navbar-brand>
-
-    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-
-    <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav v-if="logged">
-        <b-nav-item href="/bookcatalogue">Catalogue</b-nav-item>
-        <b-nav-item href="/search">Search Book</b-nav-item>
-        <b-nav-item href="/upload">Upload</b-nav-item>
-      </b-navbar-nav>
-
-      <b-navbar-nav class="ml-auto" >
-          <b-button v-if="!logged" class="mybutton" variant="outline-light" to="/login">Sign In</b-button>
-          <b-button v-if="!logged" class="mybutton" variant="outline-light" to="/register">Sign up</b-button>
-          <b-button v-if="logged" class="mybutton" variant="danger" @click="signout">Sign Out</b-button>
-      </b-navbar-nav>
-    </b-collapse>
-  </b-navbar>
-      -->
     <nav
       :style="{
         background: this.semitransparent === true ? '#00000040' : 'white'
@@ -43,17 +22,34 @@
         <div id="logged" v-if="logged">
           <div id="searchbox">
             <input
+              @keyup="onQuery"
+              v-model="query"
               placeholder="Busca un libro..."
               type="text"
               name="search"
               id="search"
             />
             <div class="filters">
-              <i class="material-icons search-icon">
+              <i class="material-icons search-icon" @click="onQuery" :style="{color: this.query.length > 0 ? '#000' : '#212529cc'}">
                 search
               </i>
-              <div class="add">
-                <div class="params-container">
+              <div class="add" @click="openParamsMenu">
+                <div
+                  class="close-params"
+                  :style="{ background: this.closeParamsOpacity }"
+                  v-if="this.openParams"
+                  @click.stop.prevent="openParamsMenu(true)"
+                ></div>
+                <div
+                  @click.stop="
+                    '';
+
+                  "
+                  id="params-menu"
+                  class="params-container"
+                  :class="{ open: this.openParams }"
+                  :style="{ transform: this.translate }"
+                >
                   <div class="spacer"></div>
                   <div class="name">Parámetros:</div>
                   <div class="params">
@@ -75,9 +71,8 @@
                     </div>
                   </div>
                 </div>
-                <div>Filtros</div>
-                <i class="material-icons">
-                  more_horiz
+                <i class="material-icons" :style="{color: this.params.filter(param => param.active && param.key !== 'title').length > 0 ? '#000' : '#212529cc'}">
+                  filter_list
                 </i>
               </div>
               <div class="tags" v-for="param of params" v-bind:key="param.key">
@@ -127,7 +122,15 @@ import book from "~/components/media/Book2.vue";
 export default {
   data() {
     return {
-      accessible: false,
+      openParams: false,
+      translate: "",
+      closeParamsOpacity: 1,
+      query: "",
+      touchY: {
+        i: 0,
+        f: 0
+      },
+      gestureContainer: {},
       params: [
         {
           key: "title",
@@ -154,6 +157,23 @@ export default {
   },
 
   methods: {
+    delay: ms => new Promise(r => setTimeout(r, ms)),
+    async openParamsMenu(close = false) {
+      if (this.openParams || close === true) {
+        this.translate = "translateY(calc(100% + 78px))";
+        this.closeParamsOpacity = 0;
+        await this.delay(250);
+        this.openParams = false;
+      } else {
+        this.openParams = true;
+      }
+      this.closeParamsOpacity = 1;
+      this.translate = "";
+    },
+    onQuery() {
+      const searchData = { query: this.query, params: this.params };
+      this.$emit("onSearch", searchData);
+    },
     signout() {
       localStorage.removeItem("user-token");
       this.$router.push({
@@ -163,11 +183,44 @@ export default {
     toggleParam(param) {
       const index = this.params.findIndex(el => el.key === param.key);
       this.params[index].active = !this.params[index].active;
+      const searchData = { query: this.query, params: this.params };
+      this.$emit("onSearch", searchData);
+    },
+    async listenContainerGesture() {
+      await this.delay(150);
+      this.gestureContainer = document.getElementById("params-menu");
+      this.gestureContainer.addEventListener(
+        "touchstart",
+        e => {
+          this.touchY.i = e.targetTouches[0].screenY;
+        },
+        false
+      );
+
+      this.gestureContainer.addEventListener(
+        "touchmove",
+        async e => {
+          this.touchY.f = e.changedTouches[0].screenY;
+          await this.handleGesture(true);
+        },
+        false
+      );
+    },
+    async handleGesture() {
+      if (this.touchY.f > this.touchY.i) {
+        const distance = this.touchY.f - this.touchY.i;
+        if (distance > 35) {
+          this.openParamsMenu(true);
+        }
+      }
     }
   },
   props: {
     logged: Boolean,
     semitransparent: Boolean
+  },
+  mounted() {
+    this.listenContainerGesture();
   }
 };
 </script>
@@ -226,6 +279,7 @@ nav > .links > div
   justify-content: center
   align-items: center
   cursor: pointer
+  box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05)
   i
     font-size: 32px
     color: #e6e6e6
@@ -280,7 +334,6 @@ nav > .links > div
   display: flex
   align-items: center
 
-
 #searchbox > .filters
   position: absolute
   right: 20px
@@ -293,11 +346,12 @@ nav > .links > div
   margin-left: 10px
   opacity: 0.8
   cursor: pointer
+  text-shadow: 3px 4px 6px rgba(0, 0, 0, 0.09), 2px -1px 6px rgba(0, 0, 0, 0.12)
 
 
 .filters > .tags > .tag
-  background: #0d860fcc
-  color: white
+  background: #F5F5F5
+  color: black
   display: flex
   padding: 2.5px 7.5px
   border-radius: 5px
@@ -307,9 +361,11 @@ nav > .links > div
   text-transform: capitalize
   transition: all 0.25s ease-in-out
   cursor: default
+  box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05)
+
 
 .filters > .tags > .tag:hover
-  background: #0d860f
+  background: #FCFCFC
 
 
 .filters > .tags > .tag > i
@@ -318,14 +374,11 @@ nav > .links > div
   cursor: pointer
 
 #searchbox .add
-  background: #00000025
   border-radius: 5px
-  width: min-content
   display: flex
   align-items: center
   justify-content: space-between
   padding: 2.5px 10px
-  min-width: 100px
   cursor: pointer
   position: relative
 
@@ -338,7 +391,7 @@ nav > .links > div
 
 #searchbox .add > i
   opacity: 0.8
-  margin-left: 10px
+  text-shadow: 3px 4px 6px rgba(0, 0, 0, 0.09), 2px -1px 6px rgba(0, 0, 0, 0.12)
 
 
 #searchbox .add > .params-container
@@ -401,19 +454,84 @@ nav > .links > div
   font-size: 14px
 
 
-.params-container > .params > .param:hover
-  background: #0d860f !important
+@media screen and(min-width: 768px) 
+  .params-container > .params > .param:hover
+    background: #0d860f !important
+
 
 
 input#search
   width: 100%
   height: 45px
-  background: #e6e6e6
+  background: #F2F2F2
   border: none
   border-radius: 15px
   padding: 0 25px
-
+  box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.045), 0 3px 6px rgba(0, 0, 0, .075)
 
 input#search:focus
   outline: none
+
+@keyframes appear-in
+  from
+    transform: translateY(calc(100% + 78px))
+  to
+    transform: translateY(0)
+
+
+@media screen and(max-width: 768px)
+    nav
+      bottom: 0
+      top: unset
+      justify-content: space-between
+      .logo
+          display: none
+      .links
+        width: 100%
+      #logged
+        width: 100%
+        flex-direction: row-reverse
+        .user-container
+          .btn-user
+            margin-left: 0
+            margin-right: 20px
+        .filters .tags
+          display: none !important
+        #searchbox
+          width: 100%
+          .close-params
+            position: fixed
+            height: 100vh
+            top: 0
+            left: 0
+            opacity: 1
+            width: 100vw
+            transition: all .25s ease-in-out
+            background: radial-gradient(#00000025, #00000050)
+
+          .params-container:not(.open)
+            display: none
+          .params-container.open
+            position: fixed
+            width: 100vw
+            bottom: 68px
+            padding-bottom: 10vh
+            padding-top: 5vh
+            left: 0;
+            transform: translate(0,0);
+            animation: appear-in .25s ease-in-out
+            transition: all .25s ease-in-out;
+            z-index: 10
+            touch-action: none
+          .open::after
+            width: 50vw
+            left: 25%
+            padding-left: 0
+            height: 4px
+            border-radius: 50px
+            background: #00000040
+            display: block
+            content: ''
+            position: absolute
+            top: 2.5vh
 </style>

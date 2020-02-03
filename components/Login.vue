@@ -46,7 +46,7 @@ export default {
     login() {
       let localThis = this;
       axios
-        .post("http://localhost:3003/user/log", {
+        .post("http://192.168.0.104:3003/user/log", {
           userName: localThis.form.username,
           password: localThis.form.password
         })

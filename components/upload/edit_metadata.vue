@@ -2,7 +2,7 @@
 import Book from "../../interfaces/book";
 import axios from "axios";
 import keywords from "../../middleware/keywords";
-import tagsEditor  from "./tags_editor.vue"
+import tagsEditor from "./tags_editor.vue";
 export default {
   props: {
     book: Book,
@@ -14,17 +14,22 @@ export default {
   data() {
     return {
       imageURL: "",
-      imageFile: undefined,
-      tagsStr: "",
-      lastTag: "",
-      tagsArr: [""],
-      allTags: []
+      imageFile: undefined
     };
   },
   mounted() {
+    this.imageURL === ""
+      ? (this.imageURL = require("../../assets/book_def_cover_" +
+          Math.floor(Math.random() * 4) +
+          ".png"))
+      : this.imageURL;
     this.book.tags = this.book.tags.length === 0 ? [""] : this.book.tags;
   },
   methods: {
+    removeCover() {
+      this.imageURL = "";
+      this.imageFile = undefined;
+    },
     extractImageFromPDF() {
       let url = URL.createObjectURL(this.file);
       import("pdfjs-dist/webpack").then(PDFJS => {
@@ -46,6 +51,7 @@ export default {
                 myCanvas.toBlob(blob => {
                   const file = this.blobToFile(blob, "image.png");
                   this.imageFile = file;
+                  this.book.imageFormat = "png";
                 });
               });
           });
@@ -55,10 +61,37 @@ export default {
     blobToFile: (blob, filename) => {
       blob.lastModifiedDate = new Date();
       blob.name = filename;
+      blob.filename = filename;
+      console.log(blob)
       return blob;
     },
     setLang(lang) {
+      if (lang === "Español") lang = "es";
+      if (lang === "English") lang = "en";
       this.book.language = lang;
+    },
+    langStr(lang) {
+      if (lang === "es") return "Español";
+      if (lang === "en") return "English";
+      else return lang;
+    },
+    updateTags(tags) {
+      this.book.tags = tags;
+    },
+    cancelUpload() {
+      this.$emit("cancelUpload");
+    },
+    onSubmit() {
+      this.book.tags = this.book.tags.filter(el => !(el === '' || typeof el !== "string"))
+      console.log(this.book)
+      this.$emit('onUploadBook', {book: this.book, imageFile: this.imageFile})
+    },
+    onImageChanged(e) {
+      const file = e.target.files[0];
+      this.book.imageFormat = file.name.split('.').pop()
+      const url = URL.createObjectURL(file);
+      this.imageURL = url;
+      this.imageFile = file;
     }
   }
 };
@@ -68,35 +101,63 @@ export default {
   <div id="uploadBox">
     <canvas id="canvas-pdf"></canvas>
     <div class="maxh" id="viewPanel">
-      <div :class="{ 'img-uploaded': this.imageURL !== '' }" class="cover-container">
-        <img
-          class="cover-default"
-          :src="
-            this.imageURL === ''
-              ? require('../../assets/book_def_cover_' +
-                  Math.floor(Math.random() * 4) +
-                  '.png')
-              : this.imageURL
-          "
-          alt
-        />
+      <div
+        :class="{ 'img-uploaded': this.imageURL !== '' }"
+        class="cover-container"
+      >
+        <img class="cover-default" :src="this.imageURL" alt />
         <div class="img-uploader-container">
           <div class="book-upload">
             <i class="material-icons">add_photo_alternate</i>
           </div>
           <div class="spacer"></div>
           <div class="menu">
-            <div class="opt">Subir imagen</div>
-            <div class="opt" @click="extractImageFromPDF">Extraer del PDF</div>
+            <input
+              type="file"
+              name="imageFile"
+              id="uploadImg"
+              accept="image/*"
+              @change="onImageChanged"
+              visible="false"
+            />
+            <label class="opt" for="uploadImg" style="margin: 0">
+              <div>Subir imagen</div>
+            </label>
+            <div
+              class="opt"
+              v-if="book.format.toLowerCase() === 'pdf'"
+              @click="extractImageFromPDF"
+            >
+              Extraer del PDF
+            </div>
+            <div
+              class="opt"
+              v-if="imageFile !== undefined"
+              @click="removeCover"
+            >
+              Eliminar imagen
+            </div>
           </div>
         </div>
       </div>
     </div>
     <div class="maxh" id="editPanel">
-      <form action="onSubmit()">
+      <form @submit.prevent="onSubmit">
         <div class="input-title">
-          <input type="text" name="title" v-model="book.title" placeholder="Titulo" id="title" />
-          <input v-model="book.author" type="text" name="author" placeholder="Autor" id="author" />
+          <input
+            type="text"
+            name="title"
+            v-model="book.title"
+            placeholder="Título"
+            id="title"
+          />
+          <input
+            v-model="book.author"
+            type="text"
+            name="author"
+            placeholder="Autor"
+            id="author"
+          />
         </div>
         <div class="input-info">
           <input
@@ -117,7 +178,9 @@ export default {
             <div class="placeholder">
               <div class="val">
                 {{
-                book.language !== "" ? book.language : "Selecciona un idioma"
+                  book.language !== ""
+                    ? this.langStr(book.language)
+                    : "Selecciona un idioma"
                 }}
               </div>
               <i class="material-icons">arrow_drop_down</i>
@@ -128,13 +191,24 @@ export default {
             </div>
           </div>
         </div>
-        <textarea v-model="book.synopsis" name="synopsis" placeholder="Sinopsis" id="synopsis"></textarea>
-        <tagsEditor :title="book.title" :synopsis="book.synopsis" :tags="book.tags"></tagsEditor>
+        <textarea
+          v-model="book.synopsis"
+          name="synopsis"
+          placeholder="Sinopsis"
+          id="synopsis"
+        ></textarea>
+        <tagsEditor
+          @updateTags="updateTags"
+          :title="book.title"
+          :synopsis="book.synopsis"
+          :tags="book.tags"
+        ></tagsEditor>
         <div class="buttons-container">
-          <div class="btn cancel">
-            <i class="material-icons">arrow_back_ios</i> Cancelar y subir otro libro
+          <div class="btn cancel" @click="cancelUpload">
+            <i class="material-icons">arrow_back_ios</i> Cancelar y subir otro
+            libro
           </div>
-          <div class="btn publish">PUBLICAR</div>
+          <button class="btn publish" type="submit">PUBLICAR</button>
         </div>
       </form>
     </div>
@@ -160,6 +234,8 @@ export default {
         width: 30%
         .cover-container.img-uploaded
             height: min-content
+            #uploadImg
+              display: none
             img.cover-default
                 object-fit: fill
                 height: auto
@@ -282,7 +358,7 @@ export default {
                 input:first-child
                   width: 65%
                 input:not(:first-child)
-                  width: 32%
+                  width: 34%
             #select-lang
                 position: relative
                 width: 28%
@@ -322,13 +398,14 @@ export default {
                     display: flex
                     align-items: center
                     padding-left: 15px
+                    color: #000000bb
                   div:not(:last-child)
                     border-bottom: 1px solid #d9d9d9
             #select-lang:hover
                 .menu
                   display: flex
                   flex-direction: column
-            
+
             .buttons-container
               transform: translateY(100%)
               margin-top: 45px

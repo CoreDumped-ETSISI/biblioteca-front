@@ -1,44 +1,4 @@
 <template>
-  <!--
-  <b-card no-body class="overflow-hidden" style="max-width: 540px;">
-    <b-row no-gutters>
-      <b-col md="5">
-        <b-card-img :src=getBookWithImage class="rounded-0"></b-card-img>
-        <b-button class="topmargin" variant="success" v-on:click="download()">Descarga</b-button>
-        <b-form-select
-            v-if="status"
-            v-model="selected"
-            :options="options"
-            value-field="item"
-            text-field="text"
-            disabled-field="notEnabled"
-						v-on:change="onChange"
-        ></b-form-select>
-      </b-col>
-      <b-col md="7">
-        <b-card-body :title="title" :sub-title="author">
-        <b-badge 
-          v-for="badge in tags"
-          v-bind:key="badge"
-          variant="success">{{badge}}
-        </b-badge>
-        <b-card-text class="limitLines">
-          {{ this.synopsis }}
-        </b-card-text>
-        <b-list-group flush>
-          <b-list-group-item><strong>Editorial: </strong>{{ publisher }}</b-list-group-item>
-          <b-list-group-item><strong>Tamaño: </strong>{{ getUnits }}</b-list-group-item>
-          <b-list-group-item><strong>Idioma: </strong>
-            <b-badge :variant=getTag.variant>{{getTag.name}}</b-badge>
-          </b-list-group-item>
-          <b-list-group-item><em>{{ getDate }}</em></b-list-group-item>
-        </b-list-group>
-
-        </b-card-body>
-      </b-col>
-    </b-row>
-  </b-card>
-  -->
   <div id="book" v-on:click="selectBook">
     <div class="img">
       <div class="download">
@@ -65,7 +25,8 @@ export default {
   data() {
     return {
       description: "Descripción por defecto, quizá demasiado corta",
-      imageSrc: "http://localhost:3003/" + this.book.sha1 + "." + this.book.imageFormat,
+      imageSrc:
+        "http://192.168.0.104:3003/" + this.book.sha1 + "." + this.book.imageFormat,
       downloads: [
         { type: "PDF", url: "#" },
         { type: "EPUB", url: "#" },
@@ -87,7 +48,9 @@ export default {
   },
   computed: {
     getBookWithImage() {
-      return "http://localhost:3003/" + this.book.sha1 + "." + this.book.imageFormat;
+      return (
+        "http://192.168.0.104:3003/" + this.book.sha1 + "." + this.book.imageFormat
+      );
     },
     getTag() {
       return this.book.languages[this.language];
@@ -116,12 +79,12 @@ export default {
 
   methods: {
     selectBook: function() {
-      this.$emit('selectBook', this.book);
+      this.$emit("selectBook", this.book);
     },
     onChange() {
       console.log(this.selected);
       axios
-        .put(`http://localhost:3003/book/` + this.id, {
+        .put(`http://192.168.0.104:3003/book/` + this.id, {
           status: this.selected
         })
         .then(response => {
@@ -133,7 +96,7 @@ export default {
         });
     },
     download() {
-      let url = "http://localhost:3003/book/download/" + this.book.filename;
+      let url = "http://192.168.0.104:3003/book/download/" + this.book.filename;
       axios({
         url: url,
         method: "GET",
@@ -177,17 +140,18 @@ export default {
 
 #book:hover img {
   width: 172px;
-  box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.116), 0 3px 6px rgba(0,0,0,0.09);
+  box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.116),
+    0 3px 6px rgba(0, 0, 0, 0.09);
   height: calc(172px * 1.35);
 }
 
 #book:hover .title {
   font-size: 18.5px;
-  text-shadow: 0 2px 3px rgba(0,0,0,0.09);
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.09);
 }
 
 #book:hover .subtitle {
-  text-shadow: 0 1px 2px rgba(0,0,0,0.09);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.09);
   font-size: 13.5px;
 }
 
@@ -206,21 +170,22 @@ export default {
   background: #0d860f;
   color: white;
   border-radius: 50%;
-  box-shadow: 0px 3px 6px 2px rgba(0,0,0,0.03), 0 3px 6px rgba(0,0,0,0.05);
+  box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05);
   height: 50px;
   width: 50px;
   cursor: pointer;
-  transition: all ease-in-out .325s;
+  transition: all ease-in-out 0.325s;
 }
 
 #book .img .download:hover {
   height: 55px;
   width: 55px;
-  box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.116), 0 3px 6px rgba(0,0,0,0.09);
+  box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.116),
+    0 3px 6px rgba(0, 0, 0, 0.09);
 }
 
 .download:hover > i {
-  animation: down-vibrate ease-in-out .5s 2;
+  animation: down-vibrate ease-in-out 0.5s 2;
   font-size: 35px !important;
 }
 
@@ -238,7 +203,7 @@ export default {
 
 #book .img .download i {
   font-size: 30px;
-  transition: all ease-in-out .325s;
+  transition: all ease-in-out 0.325s;
 }
 
 #book img {
@@ -247,8 +212,9 @@ export default {
   object-fit: cover;
   object-position: center center;
   border-radius: 7.5px;
-  box-shadow: 0px 3px 6px 2px rgba(0,0,0,0.03), 0 3px 6px rgba(214, 161, 161, 0.05);
-  transition: all ease-in-out .325s;
+  box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03),
+    0 3px 6px rgba(214, 161, 161, 0.05);
+  transition: all ease-in-out 0.325s;
 }
 
 #book > .title {
@@ -258,7 +224,7 @@ export default {
   letter-spacing: 0.75px;
   line-height: 20px;
   margin-bottom: 2.5px;
-  transition: all ease-in-out .325s;
+  transition: all ease-in-out 0.325s;
   text-shadow: 0 1.5px 3px rgba(214, 161, 161, 0.05);
 }
 
@@ -269,7 +235,42 @@ export default {
   line-height: 15px;
   opacity: 0.7;
   text-transform: uppercase;
-  transition: all ease-in-out .325s;
+  transition: all ease-in-out 0.325s;
   text-shadow: 0 1px 2px rgba(214, 161, 161, 0.05);
+}
+
+@media screen and (max-width: 768px) {
+  .download {
+    display: none !important;
+  }
+  #book {
+    width: 125px;
+  }
+  #book img {
+    width: 125px;
+    height: calc(125px * 1.35);
+  }
+  #book > .title {
+    font-size: 14px;
+    line-height: 16px;
+  }
+  #book:hover .title {
+    font-size: 14.5px;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.09);
+  }
+
+  #book:hover .subtitle {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.09);
+    font-size: 10.5px;
+  }
+
+  #book > .subtitle {
+    font-size: 10px;
+    line-height: 12px;
+  }
+  #book:hover img {
+    width: 135px;
+    height: calc(135px * 1.35);
+  }
 }
 </style>
