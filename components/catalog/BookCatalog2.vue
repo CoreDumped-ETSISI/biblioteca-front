@@ -151,13 +151,14 @@ export default {
 section {
   width: 100%;
   min-height: calc(100vh - 68px);
-  background: #fafafa;
+  background: var(--bg-color-2);
   padding-top: 30px;
   display: flex;
   justify-content: flex-end;
   padding: 0 5vw;
 }
 .title {
+  color: var(--foreground-color-main);
   font-size: 24px;
   opacity: 0.9;
   display: block;

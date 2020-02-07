@@ -2,14 +2,20 @@
   <div>
     <nav
       :style="{
-        background: this.semitransparent === true ? '#00000040' : 'white'
+        background:
+          this.semitransparent === true
+            ? 'var(--foreground-color-alt-transparent)'
+            : 'var(--bg-color-1)'
       }"
     >
       <div class="logo">
         <a
           href="/"
           :style="{
-            color: this.semitransparent === true ? 'white' : '#0d860f'
+            color:
+              this.semitransparent === true
+                ? 'var(--bg-color-1)'
+                : 'var(--main-color)'
           }"
           >Coreteca</a
         >
@@ -30,7 +36,16 @@
               id="search"
             />
             <div class="filters">
-              <i class="material-icons search-icon" @click="onQuery" :style="{color: this.query.length > 0 ? '#000' : '#212529cc'}">
+              <i
+                class="material-icons search-icon"
+                @click="onQuery"
+                :style="{
+                  color:
+                    this.query.length > 0
+                      ? 'var(--foreground-color-alt)'
+                      : 'var(--foreground-color-main)'
+                }"
+              >
                 search
               </i>
               <div class="add" @click="openParamsMenu">
@@ -44,6 +59,7 @@
                   @click.stop="
                     '';
 
+
                   "
                   id="params-menu"
                   class="params-container"
@@ -56,7 +72,7 @@
                     <div
                       @click="toggleParam(param)"
                       :style="{
-                        background: param.active ? '#0d860f' : '#0d860fb3'
+                        opacity: param.active ? 1 : 0.8
                       }"
                       class="param"
                       v-bind:key="param.key"
@@ -71,7 +87,17 @@
                     </div>
                   </div>
                 </div>
-                <i class="material-icons" :style="{color: this.params.filter(param => param.active && param.key !== 'title').length > 0 ? '#000' : '#212529cc'}">
+                <i
+                  class="material-icons"
+                  :style="{
+                    color:
+                      this.params.filter(
+                        param => param.active && param.key !== 'title'
+                      ).length > 0
+                        ? 'var(--foreground-color-alt)'
+                        : 'var(--foreground-color-main-transparent)'
+                  }"
+                >
                   filter_list
                 </i>
               </div>
@@ -258,7 +284,7 @@ nav > .links > div
   cursor: pointer
 
 .login-btn > a
-  color: white
+  color: var(--bg-color-1)
 
 .login-btn > a:hover
   text-decoration: none
@@ -272,7 +298,7 @@ nav > .links > div
 .btn-user
   height: 40px
   width: 40px
-  background: #0d860f
+  background: var(--main-color)
   border-radius: 50%
   margin-left: 20px
   display: flex
@@ -282,7 +308,7 @@ nav > .links > div
   box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05)
   i
     font-size: 32px
-    color: #e6e6e6
+    color: var(--bg-color-input)
 
 
 .user-container
@@ -294,7 +320,7 @@ nav > .links > div
 .user-container:hover
   .menu
     display: flex
-    background: white
+    background: var(--bg-color-1)
     padding: 10px 20px
     border-radius: 10px
     position: absolute
@@ -308,6 +334,8 @@ nav > .links > div
       display: flex
       flex-direction: column
       justify-content: flex-start
+      .item:not(:last-child)
+        border-bottom: 1px solid var(--color-border)
       .item
         width: 100%
         display: flex
@@ -320,9 +348,8 @@ nav > .links > div
           align-items: center
           width: 100%
           text-decoration: none
-          color: #000000cf
           font-weight: bold
-          color: #000000dd
+          color: var(--foreground-color-alt-transparent-low);
           i
             margin-right: 15px
 
@@ -350,8 +377,8 @@ nav > .links > div
 
 
 .filters > .tags > .tag
-  background: #F5F5F5
-  color: black
+  background: var(--bg-color-tag)
+  color: var(--foreground-color-alt)
   display: flex
   padding: 2.5px 7.5px
   border-radius: 5px
@@ -365,7 +392,7 @@ nav > .links > div
 
 
 .filters > .tags > .tag:hover
-  background: #FCFCFC
+  background: var(--bg-color-tag-alt);
 
 
 .filters > .tags > .tag > i
@@ -398,6 +425,8 @@ nav > .links > div
   display: none
   padding: 20px
   position: absolute
+  background: var(--bg-color-1)
+  color: var(--foreground-color-main)
 
 
 #searchbox .add > .params-container > .spacer
@@ -414,7 +443,6 @@ nav > .links > div
   justify-content: flex-start
   flex-direction: column
   min-height: 70px
-  background: white
   border-radius: 10px
   bottom: 0
   left: 0
@@ -435,8 +463,8 @@ nav > .links > div
 
 
 .params-container > .params > .param
-  background: #0d870fb3
-  color: white
+  background: var(--main-color-alt)
+  color: var(--main-color-alt-fg)
   cursor: pointer
   display: flex
   align-items: center
@@ -454,16 +482,16 @@ nav > .links > div
   font-size: 14px
 
 
-@media screen and(min-width: 768px) 
+@media screen and(min-width: 768px)
   .params-container > .params > .param:hover
-    background: #0d860f !important
+    opacity: 1 !important
 
 
 
 input#search
   width: 100%
   height: 45px
-  background: #F2F2F2
+  background: var(--bg-color-input-search);
   border: none
   border-radius: 15px
   padding: 0 25px
@@ -529,7 +557,7 @@ input#search:focus
             padding-left: 0
             height: 4px
             border-radius: 50px
-            background: #00000040
+            background: var(--foreground-color-alt-transparent)
             display: block
             content: ''
             position: absolute

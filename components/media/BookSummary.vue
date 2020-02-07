@@ -123,7 +123,9 @@ export default {
     this.listenContainerGesture();
   },
   watch: {
-    selectedBook: function(){ this.book = this.selectedBook.book }
+    selectedBook: function() {
+      this.book = this.selectedBook.book;
+    }
   },
   computed: {
     getBookWithImage() {
@@ -153,10 +155,9 @@ export default {
     getDate() {
       moment.locale("es");
       return moment(String(this.book.uploadDate)).format("DD/MM/YYYY hh:mm");
-    },
-    
+    }
   },
-  props: ['selectedBook'],
+  props: ["selectedBook"],
   methods: {
     async listenContainerGesture() {
       await this.delay(150);
@@ -258,7 +259,10 @@ export default {
         }
       } else if (!posY) {
         if (Math.abs(this.touchXi - this.touchXf) > 90) {
-          if (this.touchXf < this.touchXi && this.selectedBook.i < (this.selectedBook.len - 1)) {
+          if (
+            this.touchXf < this.touchXi &&
+            this.selectedBook.i < this.selectedBook.len - 1
+          ) {
             this.animationX = {
               transform: `translate(-100%, 0)`,
               opacity: 0.1
@@ -266,11 +270,11 @@ export default {
             this.animation = {
               transform: "translate(0)"
             };
-              await this.delay(175);
+            await this.delay(175);
             this.$emit("changeBook", { book: this.book, next: true });
             this.animationX = {
               transition: "unset",
-              transform: `translate(100%, 0)`,
+              transform: `translate(100%, 0)`
             };
             await this.delay(25);
             this.animationX = {
@@ -291,14 +295,14 @@ export default {
             this.$emit("changeBook", { book: this.book, next: false });
             this.animationX = {
               transition: "unset",
-              transform: `translate(-100%, 0)`,
+              transform: `translate(-100%, 0)`
             };
             await this.delay(25);
             this.animationX = {
               transform: `translate(-93%, 0)`,
               opacity: 1
             };
-            await this.delay(100)
+            await this.delay(100);
             this.animationX = {};
           }
         } else {
@@ -338,7 +342,8 @@ export default {
 .book-open > .book-summary {
   height: 40vh;
   width: 100vw;
-  background: white;
+  background: var(--bg-color-1);
+
   transition: all 0.35s ease-in-out;
   animation: appear-in 0.25s ease-in-out;
   border-radius: 20px 20px 0 0;
@@ -389,6 +394,7 @@ export default {
   display: flex;
   align-items: center;
   margin-bottom: 5px;
+  color: var(--foreground-color-main);
 }
 
 .book-cover > .book-info > .info > div > div {
@@ -398,15 +404,16 @@ export default {
 .book-cover > .book-info > .info > div > i {
   margin-right: 10px;
   font-size: 24px;
+  color: var(--foreground-color-main);
 }
 
 .book-cover .download {
   margin-bottom: 15px;
   width: min-content;
   padding: 0 20px;
-  color: #0d860f;
+  color: var(--main-color);
   font-weight: bold;
-  border: 2px solid #0d860f;
+  border: var(--main-color) 2px solid;
   border-radius: 20px;
   display: flex;
   justify-content: center;
@@ -417,8 +424,8 @@ export default {
 }
 
 .book-cover .download:hover {
-  background: #0d860f;
-  color: white;
+  background: var(--main-color);
+  color: var(--bg-color-1);
 }
 
 .book-cover .download i {
@@ -431,11 +438,13 @@ export default {
 
 .book-description > .book-title {
   font-size: 28px;
+  color: var(--foreground-color-main);
 }
 
 .book-description > .info {
   display: flex;
   opacity: 0.85;
+  color: var(--foreground-color-main);
 }
 
 .book-description > .info > div:first-child {
@@ -461,6 +470,7 @@ export default {
 .book-description > .synopsis {
   width: 40vw;
   margin-top: 20px;
+  color: var(--foreground-color-main);
 }
 
 .book-description > .synopsis::before {
@@ -483,8 +493,8 @@ export default {
 }
 
 .book-tags > .tag {
-  background: #0d860f;
-  color: white;
+  background: var(--bg-color-tag);
+  color: var(--foreground-color-main);
   border-radius: 2px;
   margin: 0 2.5px 10px;
   padding: 12px 15px;

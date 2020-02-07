@@ -62,7 +62,7 @@ export default {
       blob.lastModifiedDate = new Date();
       blob.name = filename;
       blob.filename = filename;
-      console.log(blob)
+      console.log(blob);
       return blob;
     },
     setLang(lang) {
@@ -82,13 +82,18 @@ export default {
       this.$emit("cancelUpload");
     },
     onSubmit() {
-      this.book.tags = this.book.tags.filter(el => !(el === '' || typeof el !== "string"))
-      console.log(this.book)
-      this.$emit('onUploadBook', {book: this.book, imageFile: this.imageFile})
+      this.book.tags = this.book.tags.filter(
+        el => !(el === "" || typeof el !== "string")
+      );
+      console.log(this.book);
+      this.$emit("onUploadBook", {
+        book: this.book,
+        imageFile: this.imageFile
+      });
     },
     onImageChanged(e) {
       const file = e.target.files[0];
-      this.book.imageFormat = file.name.split('.').pop()
+      this.book.imageFormat = file.name.split(".").pop();
       const url = URL.createObjectURL(file);
       this.imageURL = url;
       this.imageFile = file;
@@ -225,6 +230,7 @@ export default {
     height: 100vh
     min-height: 100vh
     padding: calc(68px + 7.5vh) 10vw 7.5vh
+    background: var(--bg-color-2)
     .maxh
         height: 100%
     #viewPanel
@@ -309,7 +315,7 @@ export default {
                 cursor: pointer
                 i
                     font-size: 36px
-                    color: white
+                    color: var(--bg-color-1);
             .book-upload:hover
                 opacity: .75
         .img-uploader-container
@@ -325,9 +331,10 @@ export default {
             display: flex
             flex-direction: column
             input, textarea, #select-lang
+                color: var(--foreground-color-main)
                 border: none
                 background: transparent
-                background: #F3F3F3
+                background: var(--bg-color-input)
                 border: none
                 border-radius: 15px
                 padding: 0 25px
@@ -372,6 +379,10 @@ export default {
                   div:not(.val)
                     display: flex
                     align-items: center
+                  .val
+                    text-overflow: ellipsis
+                    white-space: nowrap
+                    overflow: hidden
                 .placeholder:after
                   content: ''
                   display: block
@@ -389,7 +400,7 @@ export default {
                   transform: translateY(calc(100% + 7.5px))
                   width: 100%
                   border-radius: 15px
-                  background: #F3F3F3
+                  background: var(--bg-color-input)
                   box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0,0,0,0.05)
                   cursor: pointer
                   div
@@ -398,9 +409,9 @@ export default {
                     display: flex
                     align-items: center
                     padding-left: 15px
-                    color: #000000bb
+                    color: var(--foreground-color-alt-transparent-low)
                   div:not(:last-child)
-                    border-bottom: 1px solid #d9d9d9
+                    border-bottom: 1px solid var(--color-border)
             #select-lang:hover
                 .menu
                   display: flex
@@ -418,23 +429,23 @@ export default {
                 align-items: center
                 justify-content: center
                 cursor: pointer
-                color: #0d860f
+                color: var(--main-color)
                 padding: 0 30px
                 border-radius: 25px
                 transition: all .25s ease-in-out
               .btn.publish
                 font-size: 20px
-                border: 2px solid #0d860f
-                color: white
-                background: #0d860f
+                border: 2px solid var(--main-color)
+                color: var(--bg-color-1)
+                background: var(--main-color)
                 font-weight: bold
                 margin-left: 10px
                 box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05);
               .btn.publish:hover
-                color: white
+                color: var(--bg-color-1)
               .btn.cancel
-                color: black
+                color: var(--foreground-color-alt)
                 opacity: .7
                 i.material-icons
-                  color: #494949
+                  color: var(--foreground-color-alt-transparent-low)
 </style>

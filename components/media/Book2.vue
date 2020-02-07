@@ -26,7 +26,10 @@ export default {
     return {
       description: "Descripción por defecto, quizá demasiado corta",
       imageSrc:
-        "http://192.168.0.104:3003/" + this.book.sha1 + "." + this.book.imageFormat,
+        "http://192.168.0.104:3003/" +
+        this.book.sha1 +
+        "." +
+        this.book.imageFormat,
       downloads: [
         { type: "PDF", url: "#" },
         { type: "EPUB", url: "#" },
@@ -49,7 +52,10 @@ export default {
   computed: {
     getBookWithImage() {
       return (
-        "http://192.168.0.104:3003/" + this.book.sha1 + "." + this.book.imageFormat
+        "http://192.168.0.104:3003/" +
+        this.book.sha1 +
+        "." +
+        this.book.imageFormat
       );
     },
     getTag() {
@@ -167,8 +173,8 @@ export default {
   align-items: center;
   right: 0;
   transform: translate(50%, -50%);
-  background: #0d860f;
-  color: white;
+  background: var(--main-color-alt);
+  color: var(--main-color-alt-fg);
   border-radius: 50%;
   box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05);
   height: 50px;
@@ -226,9 +232,11 @@ export default {
   margin-bottom: 2.5px;
   transition: all ease-in-out 0.325s;
   text-shadow: 0 1.5px 3px rgba(214, 161, 161, 0.05);
+  color: var(--foreground-color-main);
 }
 
 #book > .subtitle {
+  color: var(--foreground-color-main);
   text-align: center;
   font-size: 13px;
   letter-spacing: 0.4px;

@@ -130,7 +130,9 @@ export default {
       return metrics.width;
     },
     getTagBackground: tag =>
-      tag === "" || typeof tag === "object" ? "#F5F5F5cc" : "#F5F5F5",
+      tag === "" || typeof tag === "object"
+        ? "var(--bg-color-tag-empty)"
+        : "var(--bg-color-tag)",
     removeTag: (tags, i) => tags.splice(i, 1),
     emptyTag(i) {
       this.tags[i] = "";
@@ -172,7 +174,6 @@ export default {
         }
       }
       this.addListener();
-
     }
   }
 };
@@ -231,8 +232,7 @@ export default {
 <style lang="sass" scoped>
 input
     border: none
-    background: transparent
-    background: #F3F3F3
+    background: var(--bg-color-tag)
     border: none
     border-radius: 15px
     padding: 0 25px
@@ -242,7 +242,7 @@ input
 #tags-editor
     border: none
     background: transparent
-    background: #F3F3F3
+    background: var(--bg-color-input)
     border: none
     border-radius: 15px
     padding: 0 25px
@@ -281,26 +281,27 @@ input
             .icon
                 cursor: pointer;
                 margin: 0 10px
-                color: #000000ce
+                color: var(--foreground-color-main)
+                opacity: .8
                 display: flex
                 align-items: center
-                transition: color .25s ease-in-out
+                transition: opacity .25s ease-in-out
                 i
                     font-size: 18px
             .icon:hover
-                color: black
+                opacity: 1
             .added-tag
                 font-size: 14px
                 box-shadow: none
-                color: #000000
+                color: var(--foreground-color-alt)
                 width: calc(100% + 20px)
                 height: 100%
                 padding: 0
                 margin: 0 0 0 10px
                 text-align: center
-                caret-color: #000000aa
+                caret-color: var(--foreground-color-main-transparent)
             .added-tag::placeholder
-            color: #000000bb
+            color: var(--foreground-color-main-transparent)
 
     .tags-suggest
         position: absolute
@@ -308,12 +309,12 @@ input
         left: 5px
         transform: translateY(calc(100% - 5px))
         height: 50px
-        border-top: 1px solid #d9d9d9
+        border-top: 1px solid var(--color-border)
         display: flex
         align-items: center
         width: calc(100% - 10px)
         box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0,0,0,0.05)
-        background: #F5F5F5
+        background: var(--bg-color-tag)
         border-bottom-left-radius: 10px;
         border-bottom-right-radius: 10px;
         padding: 0 25px;
@@ -323,11 +324,12 @@ input
             padding: 0 10px
             display: flex
             align-items: center
-            color: #000000f0
+            color: var(--foreground-color-main)
             border-radius: 10px
         .tags-row, .hint
             margin-left: 10px
         .hint
+            color: var(--foreground-color-main)
             opacity: .75
         .tags-row
             width: 100%
@@ -340,22 +342,22 @@ input
             .tag
                 padding: 0 10px
                 height: 25px
-                background: #FCFCFC
-                color: #000000cc
+                background: var(--bg-color-tag-alt)
+                color: var(--foreground-color-main)
                 border-radius: 7.5px
                 margin-right: 7.5px
                 display: flex
                 flex: 0 0 auto;
                 align-items: center
                 cursor: pointer;
-                transition: background .25s ease-in-out;
+                transition: background .25s ease-in-out
                 padding: 5 10px
                 box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05);
                 i
                     font-size: 18px
                     margin-left: 7.5px
             .tag:hover
-                background: #F3F3F3;
+                background: var(--bg-color-input)
             .tags-row::-webkit-scrollbar
                 display: none
 </style>
