@@ -126,6 +126,10 @@
                     <div class="text">Subir libro</div></a
                   >
                 </div>
+                <div class="item" @click="flipTheme">
+                  <i class="material-icons">nights_stay</i>
+                  <div class="text">Modo noche</div>
+                </div>
                 <div class="item" @click="signout">
                   <a
                     ><i class="material-icons">power_settings_new</i>
@@ -142,8 +146,7 @@
 </template>
 
 <script>
-import axios from "axios";
-import book from "~/components/media/Book2.vue";
+import { themeService } from "@/services/themeService";
 
 export default {
   data() {
@@ -183,6 +186,20 @@ export default {
   },
 
   methods: {
+    async flipTheme() {
+      const body = document.getElementsByTagName("body")[0];
+      const bodyCopy = body.cloneNode(true);
+      body.classList.add("tmp");
+      bodyCopy.classList.add("tmp");
+      bodyCopy.classList.add("copy");
+      body.parentNode.append(bodyCopy);
+
+      const theme = localStorage.getItem("theme");
+      themeService.setTheme(theme === "dark" ? "light" : "dark");
+      await this.delay(500);
+      body.classList.remove("tmp");
+      bodyCopy.remove();
+    },
     delay: ms => new Promise(r => setTimeout(r, ms)),
     async openParamsMenu(close = false) {
       if (this.openParams || close === true) {
@@ -315,13 +332,14 @@ nav > .links > div
   position: relative
   display: flex
   flex-direction: column
+  justify-content: center
   .menu
     display: none
 .user-container:hover
   .menu
     display: flex
     background: var(--bg-color-1)
-    padding: 10px 20px
+    padding: 0 20px
     border-radius: 10px
     position: absolute
     width: max-content;
@@ -341,14 +359,14 @@ nav > .links > div
         display: flex
         justify-content: space-between
         align-items: center
-        padding: 5px 0;
+        padding: 10px 0;
+        font-weight: bold
         a
           display: flex
           justify-content: space-between
           align-items: center
           width: 100%
           text-decoration: none
-          font-weight: bold
           color: var(--foreground-color-alt-transparent-low);
           i
             margin-right: 15px

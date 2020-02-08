@@ -378,9 +378,7 @@ export default {
   width: 270px;
   height: auto;
   border-radius: 10px;
-  box-shadow: 30px 30px 80px rgba(55, 84, 170, 0.1),
-    -30px -30px 80px rgba(255, 255, 255, 1),
-    inset 4px 4px 20px rgba(255, 255, 255, 0.5);
+  box-shadow: var(--shadow-book);
 }
 
 .book-cover > .book-info > .info {
@@ -421,11 +419,18 @@ export default {
   height: 40px;
   transition: all 0.25s ease-in-out;
   cursor: pointer;
+  box-shadow: var(--shadow-btn-main);
+  transition: transform 0.35s ease-in-out, box-shadow 0.35s ease-in-out;
 }
 
 .book-cover .download:hover {
-  background: var(--main-color);
-  color: var(--bg-color-1);
+  transform: translateY(1px);
+  box-shadow: var(--shadow-btn-main--hover);
+}
+
+.book-cover .download:active {
+  transform: translateY(2px);
+  box-shadow: var(--shadow-btn-main--hover);
 }
 
 .book-cover .download i {
@@ -503,6 +508,8 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: var(--shadow-tag);
+  border-radius: 50px;
 }
 
 .book-tags > .tag i {
