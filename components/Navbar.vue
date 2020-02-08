@@ -127,8 +127,15 @@
                   >
                 </div>
                 <div class="item" @click="flipTheme">
-                  <i class="material-icons">nights_stay</i>
-                  <div class="text">Modo noche</div>
+                  <a>
+                    <i class="material-icons">
+                      {{ theme === "light" ? "nights_stay" : "wb_sunny" }}
+                    </i>
+                    <div class="text">
+                      Modo
+                      {{ theme === "light" ? "noche" : "día" }}
+                    </div>
+                  </a>
                 </div>
                 <div class="item" @click="signout">
                   <a
@@ -147,10 +154,10 @@
 
 <script>
 import { themeService } from "@/services/themeService";
-
 export default {
   data() {
     return {
+      theme: localStorage.getItem("theme") || "light",
       openParams: false,
       translate: "",
       closeParamsOpacity: 1,
@@ -264,6 +271,9 @@ export default {
   },
   mounted() {
     this.listenContainerGesture();
+  },
+  created() {
+    themeService.getTheme().subscribe(theme => (this.theme = theme));
   }
 };
 </script>
@@ -360,8 +370,8 @@ nav > .links > div
         justify-content: space-between
         align-items: center
         padding: 10px 0;
-        font-weight: bold
         a
+          font-weight: bold
           display: flex
           justify-content: space-between
           align-items: center
