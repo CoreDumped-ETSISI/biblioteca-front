@@ -1,7 +1,21 @@
 <script>
 import { themeService } from "@/services/themeService";
-
+import { spinnerService } from "@/services/spinnerService";
+import { popupService } from "@/services/popupService";
+import popup from "@/components/popup_message.vue";
+import spinner from "@/components/Spinner";
 export default {
+  methods: {
+    popupExit() {
+      popupService.setPopup({
+        show: false,
+        duration: 5000,
+        type: "",
+        title: "",
+        subtitle: ""
+      });
+    }
+  },
   mounted() {
     const theme = localStorage.getItem("theme") || "light";
     if (theme === "null") {
@@ -16,15 +30,42 @@ export default {
       this.theme = theme;
       document.getElementsByTagName("body")[0].classList = theme;
     });
+
+    this.subscription = spinnerService.getSpinnerStatus().subscribe(status => {
+      this.showSpinner = status;
+    });
+
+    this.subscription = popupService.getPopup().subscribe(popup => {
+      this.popup = popup;
+    });
   },
   beforeDestroy() {
     this.subscription.unsubscribe();
-  }
+  },
+  data() {
+    return {
+      showSpinner: false,
+      popup: {
+        show: false,
+        duration: 5000,
+        type: "",
+        title: "",
+        subtitle: ""
+      }
+    };
+  },
+  components: { spinner, popup }
 };
 </script>
 
 <template>
   <div>
+    <popup
+      v-on:finished="popupExit"
+      v-if="popup.show"
+      v-bind:popup="popup"
+    ></popup>
+    <spinner v-if="showSpinner"></spinner>
     <nuxt />
   </div>
 </template>
@@ -39,7 +80,7 @@ export default {
   }
 
   100% {
-    clip-path: circle(0% at calc(100% - calc(2.5vw + 20px)) 34px);
+    clip-path: circle(0% at calc(100% - calc(3.5vw + 20px)) 34px);
   }
 }
 

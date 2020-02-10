@@ -1,9 +1,6 @@
 <script>
-import popupMessage from "../popup_message";
+import { popupService } from "@/services/popupService";
 export default {
-  components: {
-    popupMessage
-  },
   data() {
     return {
       newFile: {
@@ -12,14 +9,7 @@ export default {
         fileExtension: ""
       },
       validExtensions: ["pdf", "epub"],
-      validBook: false,
-      popup: {
-        show: false,
-        duration: 5000,
-        type: "error",
-        title: "Error.",
-        subtitle: "El formato del libro debe ser pdf o epub"
-      }
+      validBook: false
     };
   },
   methods: {
@@ -33,9 +23,9 @@ export default {
         );
         if (!this.validExtensions.includes(fileExtension.toLowerCase())) {
           this.validBook = false;
-          this.showPopup({
+          popupService.setPopup({
             show: true,
-            duration: 3000,
+            duration: 3500,
             type: "error",
             title: "Error.",
             subtitle: "El formato del libro debe ser pdf o epub"
@@ -59,13 +49,6 @@ export default {
 
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
     },
-    showPopup(popup) {
-      this.popup.show = true;
-      this.popup = popup;
-    },
-    popupExit() {
-      this.popup.show = false;
-    },
     emitFile() {
       this.$emit("file", this.newFile.file);
     }
@@ -75,11 +58,6 @@ export default {
 
 <template>
   <div class="upload-container">
-    <popupMessage
-      v-on:finished="popupExit"
-      v-if="popup.show"
-      v-bind:popup="popup"
-    ></popupMessage>
     <div class="upload-inner">
       <div class="upload-text">Sube un libro</div>
       <div class="upload-box">

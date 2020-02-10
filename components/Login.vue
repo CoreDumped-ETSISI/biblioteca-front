@@ -4,10 +4,19 @@
       <img class="card-img-top" src="~/assets/logo.png" />
       <b-form @submit="onSubmit" v-if="show">
         <b-form-group id="input-group-1" label="Username:" label-for="input-1">
-          <b-form-input id="input-1" v-model="form.username" required placeholder="Enter username"></b-form-input>
+          <b-form-input
+            id="input-1"
+            v-model="form.username"
+            required
+            placeholder="Enter username"
+          ></b-form-input>
         </b-form-group>
 
-        <b-form-group id="input-group-2" label="Your password:" label-for="input-2">
+        <b-form-group
+          id="input-group-2"
+          label="Your password:"
+          label-for="input-2"
+        >
           <b-form-input
             id="input-2"
             v-model="form.password"
@@ -52,17 +61,17 @@ export default {
         })
         .then(function(response) {
           console.log(response.data.token);
-		      localStorage.setItem("user-token", response.data.token);
-			    localThis.changePage()
+          localStorage.setItem("user-token", response.data.token);
+          localThis.changePage();
         })
         .catch(function(err) {
-		      localStorage.removeItem("user-token");
+          localStorage.removeItem("user-token");
           alert(err);
         });
     },
     changePage() {
       this.$router.push({
-        path: "/search"
+        path: "/bookCatalogue"
       });
     }
   }

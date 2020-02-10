@@ -21,13 +21,6 @@
           >
           </book>
         </div>
-
-        <b-pagination
-          align="center"
-          v-model="currentPage"
-          :total-rows="rows"
-          :per-page="perPage"
-        ></b-pagination>
       </div>
     </div>
   </section>
@@ -42,17 +35,6 @@ export default {
   components: {
     book,
     bookSummary
-  },
-  computed: {
-    rows() {
-      return this.posts.length;
-    },
-    currentPosts() {
-      return this.posts.slice(
-        (this.currentPage - 1) * this.perPage,
-        (this.currentPage - 1) * this.perPage + this.perPage
-      );
-    }
   },
   methods: {
     changeBook(e) {
@@ -120,8 +102,6 @@ export default {
   props: ["search"],
   data() {
     return {
-      perPage: 6,
-      currentPage: 1,
       posts: [],
       filteredBooks: [],
       errors: [],

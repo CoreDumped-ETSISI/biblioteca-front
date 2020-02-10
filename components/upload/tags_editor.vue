@@ -6,17 +6,17 @@ export default {
   props: {
     title: String,
     synopsis: String,
-    tags: Array
+    tagsInput: Array
   },
   data() {
     return {
       tagsArr: [""],
-      allTags: []
+      allTags: [],
+      tags: [...this.tagsInput]
     };
   },
   mounted() {
     this.getAllTags();
-    this.tags = this.tags.length === 0 ? [""] : this.tags;
   },
   methods: {
     addListener() {
@@ -39,6 +39,9 @@ export default {
       }
     },
     getAllTags() {
+      if (this.tags.length === 0) {
+        this.tags = [""];
+      }
       const config = {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("user-token")

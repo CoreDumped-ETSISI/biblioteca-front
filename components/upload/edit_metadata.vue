@@ -206,7 +206,7 @@ export default {
           @updateTags="updateTags"
           :title="book.title"
           :synopsis="book.synopsis"
-          :tags="book.tags"
+          :tagsInput="book.tags"
         ></tagsEditor>
         <div class="buttons-container">
           <div class="btn cancel" @click="cancelUpload">

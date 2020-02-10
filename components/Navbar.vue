@@ -10,7 +10,7 @@
     >
       <div class="logo">
         <a
-          href="/"
+          :href="logged ? '/bookcatalogue' : '/'"
           :style="{
             color:
               this.semitransparent === true

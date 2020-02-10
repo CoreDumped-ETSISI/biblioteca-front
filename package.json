@@ -27,6 +27,7 @@
     "pdfjs-dist": "^2.2.228",
     "rxjs": "^6.5.4",
     "vue-multiselect": "^2.1.6",
+    "vue-router": "^3.1.5",
     "vue-rx": "^6.2.0",
     "vuex": "^3.1.1"
   },
