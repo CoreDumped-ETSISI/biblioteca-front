@@ -65,10 +65,13 @@ body.dark {
   --foreground-color-alt-transparent-low: #ffffffdd;
   --main-color: white;
   --main-color-alt: var(--bg-color-input-search);
+  --main-color-alt-transparent: #222222b3;
   --main-color-alt-fg: var(--foreground-color-main);
+  --main-color-alt-2-fg: var(--foreground-color-main);
   --main-color--transparent: #ffffffb3;
   --bg-color-1: #1b1b1b;
   --bg-color-2: #111111;
+  --bg-btn-1: linear-gradient(145deg, #181818, #1d1d1d);
   --bg-color-input: #1a1a1a;
   --bg-color-input-search: #222;
   --bg-color-input-alt: #0d0d0d;
@@ -76,13 +79,11 @@ body.dark {
   --bg-color-tag-alt: #111;
   --bg-color-tag-empty: #0c0c0c;
   --color-border: #333;
-  --shadow-btn-main: 5px 5px 5px #00000047, -5px -5px 5px #ffffff20,
-    inset 5px 5px 5px #00000045, inset -5px -5px 5px #ffffff11;
-  --shadow-btn-main--hover: 5px 5px 5px rgba(0, 0, 0, 0.17843),
-    -5px -5px 5px rgba(255, 255, 255, 0.05549),
-    inset 5px 5px 5px rgba(0, 0, 0, 0.27059),
-    inset -5px -5px 5px rgba(255, 255, 255, 0.04667);
-  --shadow-book: 9px 9px 12px #00000087, -6px -6px 13px #1b1b1be8;
+  --shadow-btn-main: 3px 3px 5px #00000020,
+    -2px -2px 5px rgba(255, 255, 255, 0.65);
+  --shadow-btn-main--hover: 2px 2px 3px rgba(0, 0, 0, 0.2),
+    -1px -1px 3px rgba(255, 255, 255, 0.65);
+  --shadow-book: 5px 5px 8px #00000087, -4px -4px 8px #313131e8;
   --shadow-tag: 3px 3px 5px #00000050, -3px -3px 5px #161616be;
 }
 
@@ -95,9 +96,12 @@ body.light {
   --main-color: #0d860f;
   --main-color--transparent: #0d860fb3;
   --main-color-alt: var(--main-color);
+  --main-color-alt-transparent: var(--main-color--transparent);
   --main-color-alt-fg: var(--bg-color-1);
+  --main-color-alt-2-fg: #063c07;
   --bg-color-1: white;
   --bg-color-2: #fafafa;
+  --bg-btn-1: linear-gradient(145deg, #f5f5f5, #ffffff);
   --bg-color-input: #f3f3f3;
   --bg-color-input-search: #f3f3f3;
   --bg-color-input-alt: #f5f5f5;
@@ -105,11 +109,9 @@ body.light {
   --bg-color-tag-alt: #fcfcfc;
   --bg-color-tag-empty: #f5f5f5cc;
   --color-border: #d9d9d9;
-  --shadow-btn-main: 5px 5px 5px #00000027, -5px -5px 5px #08af0b20,
-    inset 3px 3px 5px #00000035, inset -5px -5px 5px #0d860f21;
-  --shadow-btn-main--hover: 5px 5px 5px #00000020, -5px -5px 5px #0d860f0e,
-    inset 3px 3px 5px #00000025, inset -5px -5px 5px #0d860f0c;
-  --shadow-book: 9px 9px 12px #00000087, -6px -6px 13px #ffffffe8;
+  --shadow-btn-main: 3px 3px 5px #00000027, -3px -3px 3px #ffffff;
+  --shadow-btn-main--hover: 2px 2px 3px #00000020, -1px -1px 3px #ffffff;
+  --shadow-book: 5px 5px 8px #00000087, -5px -5px 8px #ffffffe8;
   --shadow-tag: 3px 3px 5px hsla(0, 0%, 0%, 0.219), -5px -5px 5px #ffffffb4;
 }
 

@@ -409,10 +409,9 @@ export default {
   margin-bottom: 15px;
   width: min-content;
   padding: 0 20px;
-  color: var(--main-color);
+  color: var(--foreground-color-main);
   font-weight: bold;
-  border: var(--main-color) 2px solid;
-  border-radius: 20px;
+  border-radius: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -421,15 +420,15 @@ export default {
   cursor: pointer;
   box-shadow: var(--shadow-btn-main);
   transition: transform 0.35s ease-in-out, box-shadow 0.35s ease-in-out;
+  background: var(--bg-btn-1);
 }
 
 .book-cover .download:hover {
   transform: translateY(1px);
-  box-shadow: var(--shadow-btn-main--hover);
 }
 
 .book-cover .download:active {
-  transform: translateY(2px);
+  transform: translateY(3px);
   box-shadow: var(--shadow-btn-main--hover);
 }
 
@@ -500,7 +499,6 @@ export default {
 .book-tags > .tag {
   background: var(--bg-color-tag);
   color: var(--foreground-color-main);
-  border-radius: 2px;
   margin: 0 2.5px 10px;
   padding: 12px 15px;
   font-size: 13px;
@@ -509,12 +507,17 @@ export default {
   justify-content: space-between;
   align-items: center;
   box-shadow: var(--shadow-tag);
-  border-radius: 50px;
+  border-radius: 5px;
 }
 
 .book-tags > .tag i {
   margin-left: 10px;
   font-size: 14px;
+}
+
+.book-tags > .tag > div {
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @keyframes appear-in {

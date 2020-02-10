@@ -114,6 +114,7 @@ export default {
     align-items: center
     justify-content: center
     flex-direction: column
+    background: var(--bg-color-2)
     .upload-inner
         width: 40vw
         height: 100%
@@ -124,7 +125,7 @@ export default {
         .upload-text
             font-size: 24px
             margin-bottom: 10px
-            color: #155724
+            color: var(--foreground-color-main)
         .upload-box
             width: 100%
             height: 35vh
@@ -135,8 +136,8 @@ export default {
             justify-content: center
             align-items: center
             cursor: pointer
-            background: var(--main-color--transparent)
-            color: #063c07
+            background: var(--main-color-alt-transparent)
+            color: var(--main-color-alt-2-fg)
             position: relative
             #book-file
                 opacity: 0
@@ -152,13 +153,13 @@ export default {
                 padding: 5px 15px
                 font-weight: bold;
                 border-radius: 10px
-                border: 2px solid #155724
+                border: 2px solid var(--main-color-alt-2-fg);
                 margin-top: 25px
                 z-index: 12
                 transition: all .25s ease-in-out
             .btn-upload:hover
-                color: white
-                background: #155724
+                color: var(--bg-color-1);
+                background:  var(--main-color-alt-2-fg);
             .subtitle.noFile::before
                 display: inline
                 content: 'Elige un archivo '

@@ -520,6 +520,7 @@ input#search
   width: 100%
   height: 45px
   background: var(--bg-color-input-search);
+  color: var(--foreground-color-main);
   border: none
   border-radius: 15px
   padding: 0 25px
