@@ -149,6 +149,7 @@ export default {
         this.tags.push(...[tag, ""]);
         await this.delay(50);
         document.getElementById("tag-" + (this.tags.length - 1)).focus();
+        this.$emit("updateTags", this.tags);
       }
     },
     deleteEmptyTags() {
@@ -168,7 +169,6 @@ export default {
           this.tags[len - 1] !== "" &&
           typeof this.tags[len - 1] === "string"
         ) {
-          console.log("yeey");
           this.tags.push("");
           await this.delay(100); //dejemos 100ms para cargar el componente
           document.getElementById("tag-" + len).focus();
@@ -342,6 +342,16 @@ input
             overflow-x: auto
             overflow-y: hidden
             flex-wrap: nowrap
+            &::-webkit-scrollbar
+              height: 4px
+            &::-webkit-scrollbar-track
+                background: var(--bg-color-input-search)
+                border-radius: 10px
+            &::-webkit-scrollbar-thumb
+                background: var(--color-border);
+                border-radius: 10px;
+            &::-webkit-scrollbar-thumb:hover
+                background: var(--foreground-color-alt-transparent);
             .tag
                 padding: 0 10px
                 height: 25px

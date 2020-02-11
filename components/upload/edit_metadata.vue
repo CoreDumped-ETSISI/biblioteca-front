@@ -342,7 +342,18 @@ export default {
                 box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0,0,0,0.05)
             input
                 height: 45px
-
+            textarea
+              resize: none;
+              &::-webkit-scrollbar
+                width: 5px
+              &::-webkit-scrollbar-track
+                background: var(--bg-color-input-search)
+                border-radius: 10px
+              &::-webkit-scrollbar-thumb
+                background: var(--color-border);
+                border-radius: 10px;
+              &::-webkit-scrollbar-thumb:hover
+                background: var(--foreground-color-alt-transparent);
             textarea, #tags-editor
                 font-size: 18px
                 margin-top: 10px

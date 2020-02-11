@@ -511,7 +511,7 @@ export default {
   width: 4px;
 }
 .synopsis::-webkit-scrollbar-track {
-  background: var(--bg-color-input-search) !important;
+  background: var(--bg-color-input-search);
   border-radius: 10px;
 }
 .synopsis::-webkit-scrollbar-thumb {
@@ -519,7 +519,7 @@ export default {
   border-radius: 10px;
 }
 .synopsis::-webkit-scrollbar-thumb:hover {
-  background: red;
+  background: var(--foreground-color-alt-transparent);
 }
 
 .book-tags {
