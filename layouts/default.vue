@@ -72,7 +72,7 @@ export default {
 
 <style>
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
-@import url("https://fonts.googleapis.com/css?family=Roboto:400,500,700,900&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,900&display=swap");
 
 @keyframes clip-fade {
   0% {
@@ -157,7 +157,7 @@ body.light {
 }
 
 html {
-  font-family: "Roboto", sans-serif;
+  font-family: "Source Sans Pro", sans-serif;
   font-size: 16px;
   word-spacing: 1px;
   -ms-text-size-adjust: 100%;

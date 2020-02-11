@@ -113,7 +113,7 @@ export default {
 
   mounted() {
     let config = { headers: { Authorization: 'Bearer '+localStorage.getItem("user-token") } }
-    axios.get(`http://192.168.0.104:3003/book/getAllBooks`, config)
+    axios.get(`http://localhost:3003/book/getAllBooks`, config)
     .then(response => {
       this.posts = response.data.books.sort(function(a,b){
         return new Date(b.uploadDate) - new Date(a.uploadDate);

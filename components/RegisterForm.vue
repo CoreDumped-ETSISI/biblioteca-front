@@ -94,7 +94,7 @@
 			},
 			register(){
 				let localThis = this
-				axios.post( 'http://192.168.0.104:3003/user',
+				axios.post( 'http://localhost:3003/user',
 						{
 							'userName':localThis.form.username,
 							'firstName':localThis.form.name,

@@ -36,7 +36,7 @@ export default {
     data(){
         return {
             description: 'Descripción por defecto, quizá demasiado corta',
-            imageSrc: 'http://192.168.0.104:3003/'+this.sha1+'.'+this.imageFormat,
+            imageSrc: 'http://localhost:3003/'+this.sha1+'.'+this.imageFormat,
             statuses: ['pending', 'accepted', 'denied', 'erased'],
             selected: this.status,
 						options: [
@@ -49,7 +49,7 @@ export default {
     },
     computed: {
       getBookWithImage() {
-        return 'http://192.168.0.104:3003/'+this.sha1+'.'+this.imageFormat
+        return 'http://localhost:3003/'+this.sha1+'.'+this.imageFormat
       }
     },
     props: {
@@ -71,7 +71,7 @@ export default {
     methods: {
 				onChange(){
 					console.log(this.selected)
-					axios.put(`http://192.168.0.104:3003/book/`+this.id, {
+					axios.put(`http://localhost:3003/book/`+this.id, {
 						status: this.selected 
 					})
 					.then(response => {console.log(response)})
@@ -81,7 +81,7 @@ export default {
 					})
 				},
         download(){
-            let url = 'http://192.168.0.104:3003/book/download/'+this.filename
+            let url = 'http://localhost:3003/book/download/'+this.filename
             axios({
                 url: url,
                 method: 'GET',

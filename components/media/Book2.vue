@@ -1,7 +1,7 @@
 <template>
   <div id="book" v-on:click="selectBook">
     <div class="img">
-      <div class="download">
+      <div class="download" @click="download">
         <i class="material-icons">
           cloud_download
         </i>
@@ -26,10 +26,7 @@ export default {
     return {
       description: "Descripción por defecto, quizá demasiado corta",
       imageSrc:
-        "http://192.168.0.104:3003/" +
-        this.book.sha1 +
-        "." +
-        this.book.imageFormat,
+        "http://localhost:3003/" + this.book.sha1 + "." + this.book.imageFormat,
       downloads: [
         { type: "PDF", url: "#" },
         { type: "EPUB", url: "#" },
@@ -52,10 +49,7 @@ export default {
   computed: {
     getBookWithImage() {
       return (
-        "http://192.168.0.104:3003/" +
-        this.book.sha1 +
-        "." +
-        this.book.imageFormat
+        "http://localhost:3003/" + this.book.sha1 + "." + this.book.imageFormat
       );
     },
     getTag() {
@@ -84,13 +78,20 @@ export default {
   },
 
   methods: {
-    selectBook: function() {
-      this.$emit("selectBook", this.book);
+    selectBook(e) {
+      if (
+        !(
+          [...e.target.classList].includes("download") ||
+          [...e.target.classList].includes("material-icons")
+        )
+      ) {
+        this.$emit("selectBook", this.book);
+      }
     },
     onChange() {
       console.log(this.selected);
       axios
-        .put(`http://192.168.0.104:3003/book/` + this.id, {
+        .put(`http://localhost:3003/book/` + this.id, {
           status: this.selected
         })
         .then(response => {
@@ -102,7 +103,7 @@ export default {
         });
     },
     download() {
-      let url = "http://192.168.0.104:3003/book/download/" + this.book.filename;
+      const url = `http://localhost:3003/book/download/${this.book.filename}`;
       axios({
         url: url,
         method: "GET",
@@ -110,17 +111,17 @@ export default {
       })
         .then(response => {
           console.log(response);
-          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const url2 = window.URL.createObjectURL(new Blob([response.data]));
           const link = document.createElement("a");
-          link.href = url;
+          link.href = url2;
           link.setAttribute(
             "download",
-            this.book.title + "-" + this.book.author + "." + this.book.format
+            `${this.book.title}-${this.book.author}.${this.book.format}`
           ); //or any other extension
           document.body.appendChild(link);
           link.click();
         })
-        .catch(function(err) {
+        .catch(err => {
           console.log(err);
           console.log("FAILURE!!");
         });

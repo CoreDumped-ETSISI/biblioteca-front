@@ -68,7 +68,7 @@ export default {
       formData.append("book", file);
 
       axios
-        .post("http://192.168.0.104:3003/book/getMetadata", formData, {
+        .post("http://localhost:3003/book/getMetadata", formData, {
           headers: {
             "Content-Type": "multipart/form-data"
           }
@@ -100,7 +100,7 @@ export default {
       formData.append("data", JSON.stringify(book));
 
       axios
-        .post("http://192.168.0.104:3003/book/uploadBook", formData, {
+        .post("http://localhost:3003/book/uploadBook", formData, {
           headers: {
             "Content-Type": "multipart/form-data"
           }
@@ -144,7 +144,7 @@ export default {
       formData.append("data", JSON.stringify(data));
 
       axios
-        .post("http://192.168.0.104:3003/book/uploadImage", formData, {
+        .post("http://localhost:3003/book/uploadImage", formData, {
           headers: {
             "Content-Type": "multipart/form-data"
           }
@@ -188,7 +188,7 @@ export default {
         console.log(formData);
 
 
-        axios.post('http://192.168.0.104:3003/book/uploadImage',
+        axios.post('http://localhost:3003/book/uploadImage',
             formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'

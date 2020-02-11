@@ -48,7 +48,7 @@ export default {
         }
       };
       axios
-        .get(`http://192.168.0.104:3003/book/getAllBooks`, config)
+        .get(`http://localhost:3003/book/getAllBooks`, config)
         .then(response => {
           const books = response.data.books;
           for (let book of books) {

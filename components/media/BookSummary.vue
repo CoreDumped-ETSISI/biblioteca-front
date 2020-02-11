@@ -10,7 +10,7 @@
         <div class="book-cover">
           <img :src="getBookWithImage" />
           <div class="book-info">
-            <div class="download">
+            <div class="download" @click="download">
               <i class="material-icons">cloud_download</i> Descargar
             </div>
             <div class="info">
@@ -40,7 +40,7 @@
             <div class="publisher">{{ book.publisher }}</div>
           </div>
           <hr />
-          <div class="synopsis">{{ book.synopsis }}</div>
+          <p class="synopsis">{{ book.synopsis }}</p>
         </div>
         <div class="book-tags">
           <div class="tag" v-for="tag of book.tags" v-bind:key="tag">
@@ -66,8 +66,7 @@ export default {
       animation: { transform: "none" },
       animationX: { transform: "none" },
       description: "Descripción por defecto, quizá demasiado corta",
-      imageSrc:
-        "http://192.168.0.104:3003/" + this.sha1 + "." + this.imageFormat,
+      imageSrc: "http://localhost:3003/" + this.sha1 + "." + this.imageFormat,
       downloads: [
         {
           type: "PDF",
@@ -130,10 +129,7 @@ export default {
   computed: {
     getBookWithImage() {
       return (
-        "http://192.168.0.104:3003/" +
-        this.book.sha1 +
-        "." +
-        this.book.imageFormat
+        "http://localhost:3003/" + this.book.sha1 + "." + this.book.imageFormat
       );
     },
     getTag() {
@@ -159,6 +155,30 @@ export default {
   },
   props: ["selectedBook"],
   methods: {
+    download() {
+      const url = `http://localhost:3003/book/download/${this.book.filename}`;
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob" // important
+      })
+        .then(response => {
+          console.log(response);
+          const url2 = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement("a");
+          link.href = url2;
+          link.setAttribute(
+            "download",
+            `${this.book.title}-${this.book.author}.${this.book.format}`
+          ); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch(err => {
+          console.log(err);
+          console.log("FAILURE!!");
+        });
+    },
     async listenContainerGesture() {
       await this.delay(150);
       this.gestureContainer = document.getElementById("book-summary");
@@ -205,7 +225,7 @@ export default {
     },
     onChange() {
       axios
-        .put(`http://192.168.0.104:3003/book/` + this.id, {
+        .put(`http://localhost:3003/book/` + this.id, {
           status: this.selected
         })
         .then(response => {
@@ -217,7 +237,7 @@ export default {
         });
     },
     download() {
-      let url = "http://192.168.0.104:3003/book/download/" + this.book.filename;
+      let url = "http://localhost:3003/book/download/" + this.book.filename;
       axios({
         url: url,
         method: "GET",
@@ -334,13 +354,13 @@ export default {
 }
 
 .book-open > .close-summary {
-  height: 60vh;
+  height: 25vh;
   width: 100vw;
   cursor: pointer;
 }
 
 .book-open > .book-summary {
-  height: 40vh;
+  height: 75vh;
   width: 100vw;
   background: var(--bg-color-1);
 
@@ -362,7 +382,6 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: space-between;
-  transform: translateY(calc(-50% - 50px));
   max-width: 270px;
   align-items: center;
 }
@@ -472,9 +491,13 @@ export default {
 }
 
 .book-description > .synopsis {
-  width: 40vw;
+  width: 45vw;
+  max-height: 52.5vh;
+  overflow-y: auto;
   margin-top: 20px;
   color: var(--foreground-color-main);
+  padding-right: 20px;
+  text-align: justify;
 }
 
 .book-description > .synopsis::before {
@@ -482,6 +505,21 @@ export default {
   display: inline;
   font-size: 13px;
   font-weight: bold;
+}
+
+.synopsis::-webkit-scrollbar {
+  width: 4px;
+}
+.synopsis::-webkit-scrollbar-track {
+  background: var(--bg-color-input-search) !important;
+  border-radius: 10px;
+}
+.synopsis::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
+}
+.synopsis::-webkit-scrollbar-thumb:hover {
+  background: red;
 }
 
 .book-tags {
@@ -593,6 +631,7 @@ export default {
   .book-description > .synopsis {
     width: 100%;
   }
+
   .book-tags {
     margin: 25px 0 88px;
   }
