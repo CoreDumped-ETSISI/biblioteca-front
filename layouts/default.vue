@@ -121,7 +121,7 @@ body.dark {
   --bg-color-tag-empty: #0c0c0c;
   --color-border: #333;
   --shadow-btn-main: 3px 3px 5px #00000020,
-    -2px -2px 5px rgba(255, 255, 255, 0.65);
+    -3px -3px 4px rgba(102, 102, 102, 0.65);
   --shadow-btn-main--hover: 2px 2px 3px rgba(0, 0, 0, 0.2),
     -1px -1px 3px rgba(255, 255, 255, 0.65);
   --shadow-book: 5px 5px 8px #00000087, -4px -4px 8px #313131e8;

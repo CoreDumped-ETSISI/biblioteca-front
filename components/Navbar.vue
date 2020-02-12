@@ -56,13 +56,13 @@
                   @click.stop.prevent="openParamsMenu(true)"
                 ></div>
                 <div
+                  id="params-menu"
+                  class="params-container"
                   @click.stop="
                     '';
 
 
                   "
-                  id="params-menu"
-                  class="params-container"
                   :class="{ open: this.openParams }"
                   :style="{ transform: this.translate }"
                 >
@@ -112,13 +112,28 @@
             </div>
           </div>
           <div class="user-container">
-            <div class="btn-user">
+            <div
+              class="close-menu"
+              :style="{ background: this.closeMenuOpacity }"
+              v-if="this.openMenu"
+              @click.stop.prevent="openMainMenu(true)"
+            ></div>
+            <div class="btn-user" @click="openMainMenu">
               <i class="material-icons">
                 person
               </i>
             </div>
             <div class="spacer"></div>
-            <div class="menu">
+            <div
+              class="menu"
+              @click.stop="
+                '';
+
+
+              "
+              :class="{ open: this.openMenu }"
+              :style="{ transform: this.translateM }"
+            >
               <div class="items">
                 <div class="item">
                   <a href="/upload"
@@ -137,7 +152,7 @@
                     </div>
                   </a>
                 </div>
-                <div class="item" @click="signout">
+                <div class="item signout" @click="signout">
                   <a
                     ><i class="material-icons">power_settings_new</i>
                     <div class="text">Cerrar sesión</div></a
@@ -159,8 +174,11 @@ export default {
     return {
       theme: localStorage.getItem("theme") || "light",
       openParams: false,
+      openMenu: false,
       translate: "",
+      translateM: "",
       closeParamsOpacity: 1,
+      closeMenuOpacity: 1,
       query: "",
       touchY: {
         i: 0,
@@ -208,6 +226,18 @@ export default {
       bodyCopy.remove();
     },
     delay: ms => new Promise(r => setTimeout(r, ms)),
+    async openMainMenu(close = false) {
+      if (this.openMenu || close === true) {
+        this.translateM = "translateY(calc(100% + 78px))";
+        this.closeMenuOpacity = 0;
+        await this.delay(250);
+        this.openMenu = false;
+      } else {
+        this.openMenu = true;
+      }
+      this.closeMenuOpacity = 1;
+      this.translateM = "";
+    },
     async openParamsMenu(close = false) {
       if (this.openParams || close === true) {
         this.translate = "translateY(calc(100% + 78px))";
@@ -349,14 +379,12 @@ nav > .links > div
   .menu
     display: flex
     background: var(--bg-color-1)
-    padding: 0 20px
+    padding: 7.5px 16px 7.5px 20px
     border-radius: 10px
     position: absolute
     width: max-content;
-    box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.05)
-    bottom: 0
+    box-shadow: var(--shadow-btn-main)
     right: 0
-    transform: translateY(calc(100% + 2.5px))
     .items
       width: 100%
       display: flex
@@ -369,17 +397,24 @@ nav > .links > div
         display: flex
         justify-content: space-between
         align-items: center
-        padding: 10px 0;
+        padding: 12.5px 0;
+        border-right: 4px solid transparent
+
+
+        &.signout
+          opacity: .75
+          border-right: 4px solid crimson
         a
           font-weight: bold
           display: flex
-          justify-content: space-between
+          justify-content: flex-start
+          flex-direction: row-reverse
           align-items: center
           width: 100%
           text-decoration: none
           color: var(--foreground-color-alt-transparent-low);
           i
-            margin-right: 15px
+            margin: 0 15px
 
 
 
@@ -535,6 +570,10 @@ input#search:focus
   to
     transform: translateY(0)
 
+@media screen and(min-width: 768px)
+  .menu
+    bottom: -5px
+    transform: translateY(calc(100% + 2.5px))
 
 @media screen and(max-width: 768px)
     nav
@@ -591,4 +630,35 @@ input#search:focus
             content: ''
             position: absolute
             top: 2.5vh
+        .close-menu
+            position: fixed
+            height: 100vh
+            top: 0
+            left: 0
+            opacity: 1
+            width: 100vw
+            transition: all .25s ease-in-out
+            background: radial-gradient(#00000025, #00000050)
+        .menu:not(.open)
+          display: none
+        .menu.open
+          position: fixed
+          width: 100vw
+          bottom: 68px
+          padding: 25px 25px;
+          left: 0;
+          transform: translate(0,0);
+          animation: appear-in .25s ease-in-out
+          transition: all .25s ease-in-out;
+          z-index: 10
+          .item:not(:last-child)
+            border-bottom: 1px solid var(--foreground-color-alt-transparent)
+          .item
+            padding: 15px 0
+            & a
+              justify-content: flex-start
+              flex-direction: row-reverse
+              & i
+                margin-right: 0
+                margin-left: 15px
 </style>
