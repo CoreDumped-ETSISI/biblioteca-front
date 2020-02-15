@@ -1,0 +1,29 @@
+:root {
+  --foreground-color-main: #eaeaea;
+  --foreground-color-main-transparent: #eaeaeacc;
+  --foreground-color-alt: #fff;
+  --foreground-color-alt-transparent: #ffffff40;
+  --foreground-color-alt-transparent-low: #ffffffdd;
+  --main-color: white;
+  --main-color-alt: var(--bg-color-input-search);
+  --main-color-alt-fg: var(--foreground-color-main);
+  --main-color--transparent: #ffffffb3;
+  --bg-color-1: #1b1b1b;
+  --bg-color-2: #000;
+  --bg-color-input: #1a1a1a;
+  --bg-color-input-search: #222;
+  --bg-color-input-alt: #0d0d0d;
+  --bg-color-tag: #0d0d0d;
+  --bg-color-tag-alt: #000;
+  --bg-color-tag-empty: #0c0c0c;
+  --color-border: #333;
+
+  --shadow-btn-main: 5px 5px 5px #00000047, -5px -5px 5px #ffffff20,
+    inset 5px 5px 5px #00000045, inset -5px -5px 5px #ffffff11;
+  --shadow-btn-main--hover: 5px 5px 5px rgba(0, 0, 0, 0.17843),
+    -5px -5px 5px rgba(255, 255, 255, 0.05549),
+    inset 5px 5px 5px rgba(0, 0, 0, 0.27059),
+    inset -5px -5px 5px rgba(255, 255, 255, 0.04667);
+  --shadow-book: 9px 9px 12px #00000087, -6px -6px 13px #1b1b1be8;
+  --shadow-tag: 3px 3px 5px #00000050, -3px -3px 5px #161616be;
+}

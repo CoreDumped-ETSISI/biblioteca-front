@@ -1,13 +1,19 @@
 <template>
-    <Login></Login>
+  <div>
+      <topnavbar :logged=false></topnavbar>
+      <Login></Login>
+  </div>
 </template>
 
 <script>
 import Login from '~/components/Login.vue'
+import topnavbar from '../components/Navbar.vue'
 
 export default {
+  middleware: 'isNotLogged',
   components: {
-    Login
+    Login,
+    topnavbar
   }
 }
 </script>

@@ -4,10 +4,19 @@
       <img class="card-img-top" src="~/assets/logo.png" />
       <b-form @submit="onSubmit" v-if="show">
         <b-form-group id="input-group-1" label="Username:" label-for="input-1">
-          <b-form-input id="input-1" v-model="form.username" required placeholder="Enter username"></b-form-input>
+          <b-form-input
+            id="input-1"
+            v-model="form.username"
+            required
+            placeholder="Enter username"
+          ></b-form-input>
         </b-form-group>
 
-        <b-form-group id="input-group-2" label="Your password:" label-for="input-2">
+        <b-form-group
+          id="input-group-2"
+          label="Your password:"
+          label-for="input-2"
+        >
           <b-form-input
             id="input-2"
             v-model="form.password"
@@ -28,7 +37,6 @@
 
 <script>
 import axios from "axios";
-const Cookie = process.client ? require('js-cookie') : undefined
 export default {
   data() {
     return {
@@ -53,21 +61,17 @@ export default {
         })
         .then(function(response) {
           console.log(response.data.token);
-		  //localThis.localStorage.setItem("user-token", response.data.token);
-		  localThis.$store.commit('setAuth', response.data.token) // mutating to store for client rendering
-			Cookie.set('auth', response.data) // saving token in cookie for server rendering
-			localThis.changePage()
+          localStorage.setItem("user-token", response.data.token);
+          localThis.changePage();
         })
         .catch(function(err) {
-		  //localThis.localStorage.removeItem("user-token");
-		  localThis.$store.commit('setAuth', null)
-		  Cookie.remove('auth')
+          localStorage.removeItem("user-token");
           alert(err);
         });
     },
     changePage() {
       this.$router.push({
-        path: "/search"
+        path: "/bookCatalogue"
       });
     }
   }

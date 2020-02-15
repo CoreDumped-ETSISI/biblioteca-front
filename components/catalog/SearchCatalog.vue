@@ -18,21 +18,19 @@
     <h2 class="text-center noResult" v-if="noResult">No hay ningun libro con esos parámetros</h2>
     <b-card-group columns>     
         <book 
-            v-for="post of searchAllFields" 
+            v-for="post of currentPosts" 
             v-bind:key="post.id" 
-            :title=post.title 
-            :author=post.author 
-            :synopsis=post.synopsis 
-            :publisher=post.publisher 
-            :size=post.size 
-            :language=post.language
-            :tags=post.tags
-            :filename=post.filename 
-            :format=post.format
-            :sha1=post.sha1
-            :imageFormat=post.imageFormat>
+            :book=post>
         </book>
     </b-card-group>
+
+    <b-pagination
+      align="center"
+      v-if="!noResult"
+      v-model="currentPage"
+      :total-rows="rows"
+      :per-page="perPage"
+    ></b-pagination>
 </div>
 </template>
 
@@ -64,7 +62,9 @@ export default {
       selected: null,
       options: ['title', 'author', 'synopsis', 'publisher', 'tags'],
       value: [],
-      noResult: false
+      noResult: false,
+      perPage: 6,
+      currentPage: 1,
     }
   },
 
@@ -91,12 +91,20 @@ export default {
         }
         return false
       })
+    },
+    rows() {
+        return this.searchAllFields.length
+    },
+
+    currentPosts() {
+        console.log((this.currentPage-1)*this.perPage )
+        console.log((this.currentPage-1)*this.perPage+this.perPage)
+          return this.searchAllFields.slice((this.currentPage-1)*this.perPage, (this.currentPage-1)*this.perPage+this.perPage)
     }
   },
 
   mounted() {
-    console.log(2)
-    let config = { headers: { Authorization: 'Bearer '+this.$store.state.auth.token } }
+    let config = { headers: { Authorization: 'Bearer '+localStorage.getItem("user-token") } }
     axios.get(`http://localhost:3003/book/getAllBooks`, config)
     .then(response => {
       this.posts = response.data.books
@@ -104,7 +112,9 @@ export default {
         if(post.status === "accepted")
           return true
         return false
-      })
+      }).sort(function(a,b){
+        return new Date(b.uploadDate) - new Date(a.uploadDate);
+      });
       console.log(this.posts)
     })
     .catch(e => {
