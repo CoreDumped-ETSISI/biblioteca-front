@@ -3,13 +3,15 @@ import Book from "../../interfaces/book";
 import axios from "axios";
 import keywords from "../../middleware/keywords";
 import tagsEditor from "./tags_editor.vue";
+import inputComp from "@/components/input.vue";
 export default {
   props: {
     book: Book,
     file: File
   },
   components: {
-    tagsEditor
+    tagsEditor,
+    inputComp
   },
   data() {
     return {
@@ -149,36 +151,32 @@ export default {
     <div class="maxh" id="editPanel">
       <form @submit.prevent="onSubmit">
         <div class="input-title">
-          <input
-            type="text"
-            name="title"
-            v-model="book.title"
-            placeholder="Título"
-            id="title"
-          />
-          <input
-            v-model="book.author"
-            type="text"
-            name="author"
-            placeholder="Autor"
-            id="author"
-          />
+          <inputComp
+            @val="title => (this.book.title = title)"
+            :value="this.book.title"
+            v-bind:type="'text'"
+            v-bind:placeholder="'Título'"
+          ></inputComp>
+          <inputComp
+            @val="author => (this.book.author = author)"
+            :value="this.book.author"
+            v-bind:type="'text'"
+            v-bind:placeholder="'Autor'"
+          ></inputComp>
         </div>
         <div class="input-info">
-          <input
-            type="text"
-            name="publisher"
-            placeholder="Editorial"
-            id="publisher"
-            v-model="book.publisher"
-          />
-          <input
-            v-model="book.publishDate"
-            type="text"
-            name="publishYear"
-            placeholder="Año de publicación"
-            id="publishYear"
-          />
+          <inputComp
+            @val="pub => (this.book.publisher = pub)"
+            :value="this.book.publisher"
+            v-bind:type="'text'"
+            v-bind:placeholder="'Editorial'"
+          ></inputComp>
+          <inputComp
+            @val="year => (this.book.publishDate = year)"
+            :value="this.book.publishDate"
+            v-bind:type="'text'"
+            v-bind:placeholder="'Año de publicación'"
+          ></inputComp>
           <div id="select-lang">
             <div class="placeholder">
               <div class="val">
@@ -196,12 +194,12 @@ export default {
             </div>
           </div>
         </div>
-        <textarea
-          v-model="book.synopsis"
-          name="synopsis"
-          placeholder="Sinopsis"
-          id="synopsis"
-        ></textarea>
+        <inputComp
+          @val="synopsis => (this.book.synopsis = synopsis)"
+          :value="this.book.synopsis"
+          v-bind:type="'textarea'"
+          v-bind:placeholder="'Sinopsís'"
+        ></inputComp>
         <tagsEditor
           @updateTags="updateTags"
           :title="book.title"
@@ -330,54 +328,34 @@ export default {
             width: 100%
             display: flex
             flex-direction: column
-            input, textarea, #select-lang
-                color: var(--foreground-color-main)
-                border: none
-                background: transparent
-                background: var(--bg-color-input)
-                border: none
-                border-radius: 15px
-                padding: 0 25px
-                margin: 5px
-                box-shadow: 0px 3px 6px 2px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0,0,0,0.05)
-            input
-                height: 45px
-            textarea
-              resize: none;
-              &::-webkit-scrollbar
-                width: 5px
-              &::-webkit-scrollbar-track
-                background: var(--bg-color-input-search)
-                border-radius: 10px
-              &::-webkit-scrollbar-thumb
-                background: var(--color-border);
-                border-radius: 10px;
-              &::-webkit-scrollbar-thumb:hover
-                background: var(--foreground-color-alt-transparent);
-            textarea, #tags-editor
-                font-size: 18px
-                margin-top: 10px
-                min-height: 120px
-                padding: 10px 25px
-            input:focus , textarea:focus, select:focus, #tags-editor:focus
-                outline: none
+
             .input-info
                 display: flex
                 justify-content: space-between
                 width: 100%
-                input:first-child
-                    width: 48%
-                input:not(:first-child)
+                div:first-child
+                    width: 46%
+                div:not(:first-child)
                     width: 23%
             .input-title
                 display: flex
                 justify-content: space-between
                 width: 100%
-                input:first-child
+                div:first-child
                   width: 65%
-                input:not(:first-child)
+                div:not(:first-child)
                   width: 34%
             #select-lang
+                background: var(--bg-color-input)
+                border-radius: 15px
+                color: var(--foreground-color-main);
+                background: var(--bg-color-input);
+                border: none;
+                border-radius: 15px;
+                padding: 0 25px;
+                margin: 5px;
+                box-shadow: var(--shadow-input);
+                width: 100%;
                 position: relative
                 width: 28%
                 .placeholder

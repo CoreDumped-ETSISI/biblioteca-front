@@ -126,6 +126,7 @@ body.dark {
     -1px -1px 3px rgba(255, 255, 255, 0.65);
   --shadow-book: 5px 5px 8px #00000087, -4px -4px 8px #313131e8;
   --shadow-tag: 3px 3px 5px #00000050, -3px -3px 5px #161616be;
+  --shadow-input: 3px 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 body.light {
@@ -154,6 +155,8 @@ body.light {
   --shadow-btn-main--hover: 2px 2px 3px #00000020, -1px -1px 3px #ffffff;
   --shadow-book: 5px 5px 8px #00000087, -5px -5px 8px #ffffffe8;
   --shadow-tag: 3px 3px 5px hsla(0, 0%, 0%, 0.219), -5px -5px 5px #ffffffb4;
+  --shadow-input: 3px 3px 6px rgba(0, 0, 0, 0.1),
+    -3px -3px 6px rgba(255, 255, 255, 1);
 }
 
 html {
