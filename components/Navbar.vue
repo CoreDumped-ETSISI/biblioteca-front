@@ -136,6 +136,12 @@
             >
               <div class="items">
                 <div class="item">
+                  <a href="/profile"
+                    ><i class="material-icons">person</i>
+                    <div class="text">Perfil</div></a
+                  >
+                </div>
+                <div class="item">
                   <a href="/upload"
                     ><i class="material-icons">cloud_upload</i>
                     <div class="text">Subir libro</div></a

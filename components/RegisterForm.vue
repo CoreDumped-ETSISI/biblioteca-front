@@ -126,7 +126,7 @@
 			width: 60%;
 	}
 	.card {
-		margin-top: 20px;
+		margin-top: 50px;
 	}
 	.grey-text {
 		margin-top: 10px;

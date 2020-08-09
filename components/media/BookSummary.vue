@@ -115,7 +115,8 @@ export default {
       touchYi: 0,
       touchXf: 0,
       touchYf: 0,
-      gestureContainer: {}
+      gestureContainer: {},
+      librosString: ['libro1.png', 'libro2.png', 'libro3.png', 'libro4.png']
     };
   },
   mounted() {
@@ -128,9 +129,10 @@ export default {
   },
   computed: {
     getBookWithImage() {
-      return (
-        "http://localhost:3003/" + this.book.sha1 + "." + this.book.imageFormat
-      );
+      if(this.book.imageFormat == '')
+        return 'http://localhost:3003/'+this.librosString[Math.floor(Math.random() * this.librosString.length)]
+        
+      return 'http://localhost:3003/'+this.book.sha1+'.'+this.book.imageFormat
     },
     getTag() {
       return this.languages[this.book.language];

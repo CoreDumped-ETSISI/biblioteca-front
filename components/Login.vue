@@ -86,7 +86,7 @@ export default {
   width: 60%;
 }
 .card {
-  margin-top: 20px;
+  margin-top: 150px;
 }
 .grey-text {
   margin-top: 10px;
