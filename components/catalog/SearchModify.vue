@@ -1,141 +1,166 @@
 <template>
-<div id="book-test">
-  <div class="row lowMargin">
-    <div class="col-md-9 m-auto">
-      <h1 class="text-center display-4 my-4">Busca un libro</h1>
-      <multiselect 
-        v-model="value" 
-        tag-placeholder="Add this as new tag" 
-        placeholder="Include search parameters" 
-        :options="options" 
-        :multiple="true" 
-        :taggable="true" 
-        @tag="addTag">
-      </multiselect>
-      <b-form-input v-model="text" placeholder="Enter your search terms"></b-form-input>
-    </div>
-  </div>
-    <h2 class="text-center noResult" v-if="noResult">No hay ningun libro con esos parámetros</h2>
-    <b-card-group columns>     
-        <book 
-            v-for="post of currentPosts" 
-            v-bind:key="post.id"
-            :id=post._id
-            :status=post.status
-            :title=post.title 
-            :author=post.author 
-            :synopsis=post.synopsis 
-            :publisher=post.publisher 
-            :size=post.size 
-            :language=post.language
-            :tags=post.tags
-            :filename=post.filename 
-            :format=post.format
-            :sha1=post.sha1
-            :imageFormat=post.imageFormat
-            :uploadDate=post.uploadDate>
-        </book>
-    </b-card-group>
+  <section>
+    <bookSummary
+      v-if="selectedBook !== undefined"
+      v-bind:selectedBook="selectedBook"
+      v-on:close="selectBook($event)"
+      @changeBook="changeBook"
+    ></bookSummary>
+    <div id="library">
+      <div class="lowMargin">
+        <div class="title">
+          Catálogo de libros
+        </div>
 
-    <b-pagination
-      align="center"
-      v-if="!noResult"
-      v-model="currentPage"
-      :total-rows="rows"
-      :per-page="perPage"
-    ></b-pagination>
-</div>
+        <div class="books">
+          <book
+            v-for="post in search.query.length === 0 ? posts : filteredBooks"
+            v-on:selectBook="selectBook($event)"
+            v-bind:key="post.id"
+            :book="post"
+          >
+          </book>
+        </div>
+      </div>
+    </div>
+  </section>
 </template>
 
 <script>
-import axios from 'axios';
-import book from '~/components/media/Book2.vue'
-import Multiselect from 'vue-multiselect'
+import axios from "axios";
+import book from "~/components/media/BookTemp.vue";
+import bookSummary from "~/components/media/BookSummary.vue";
 
 export default {
   components: {
     book,
-    Multiselect 
+    bookSummary
   },
   methods: {
-      addTag () {
-        this.options.push(tag)
-        this.value.push(tag)
-        console.log(this.value)
-      },
-      myData() {
-        console.log(this.value)
+    changeBook(e) {
+      const i = this.posts.map(el => el._id).indexOf(e.book._id);
+      if (e.next) {
+        if (i + 1 < this.posts.length) {
+          this.selectBook(this.posts[i + 1], i + 1);
+        }
+      } else {
+        if (i > 0) {
+          this.selectBook(this.posts[i - 1], i - 1);
+        }
       }
     },
-    data() {
-    return {
-      posts: [],
-      errors: [],
-      text: '',
-      selected: null,
-      options: ['title', 'author', 'synopsis', 'publisher', 'status'],
-      value: [],
-      noResult: false,
-      perPage: 6,
-      currentPage: 1
+    selectBook(
+      book,
+      i = book === "close" ? -1 : this.posts.map(el => el._id).indexOf(book._id)
+    ) {
+      const len = this.posts.length;
+      if (book !== "close") {
+        this.selectedBook = { book, i, len };
+      } else {
+        this.selectedBook = undefined;
+      }
+    },
+    intersection: (arrayA, arrayB) => arrayA.filter(el => arrayB.includes(el))
+  },
+  watch: {
+    search: function() {
+      if (this.search.query !== "") {
+        this.filteredBooks = this.posts.filter(book => {
+          if (this.search.params.every(el => !el.active)) {
+            this.search.params[0].active = true;
+          }
+          for (const param of this.search.params) {
+            if (param.key !== "tags") {
+              if (
+                param.active &&
+                book[param.key]
+                  .toLowerCase()
+                  .includes(this.search.query.toLowerCase())
+              ) {
+                return true;
+              }
+            } else {
+              if (
+                this.intersection(
+                  book.tags.map(el => (el = el.toLowerCase())),
+                  this.search.query
+                    .split(/[\s,]/g)
+                    .map(el => (el = el.toLowerCase()))
+                ).length > 0
+              ) {
+                return true;
+              }
+            }
+          }
+          return false;
+        });
+      } else {
+        this.filteredBooks = this.posts;
+      }
     }
   },
-
-  computed: {
-    searchAllFields() {
-      let localThis = this
-      let categories = this.value
-      if(categories.length == 0)
-        categories = this.options
-
-      this.noResult = true
-      return this.posts.filter(function(post){
-        var i
-        for(i=0 ; i<categories.length ; i++){
-          if(post[categories[i]].toLowerCase().includes(localThis.text.toLowerCase())){
-            localThis.noResult = false
-            return true
-          }
-        }
-        return false
-      })
-    },
-    rows() {
-        return this.searchAllFields.length
-    },
-
-    currentPosts() {
-        console.log((this.currentPage-1)*this.perPage )
-        console.log((this.currentPage-1)*this.perPage+this.perPage)
-          return this.searchAllFields.slice((this.currentPage-1)*this.perPage, (this.currentPage-1)*this.perPage+this.perPage)
-    }
+  props: ["search"],
+  data() {
+    return {
+      posts: [],
+      filteredBooks: [],
+      errors: [],
+      selectedBook: undefined
+    };
   },
 
   mounted() {
-    let config = { headers: { Authorization: 'Bearer '+localStorage.getItem("user-token") } }
-    axios.get(`http://localhost:3003/book/getAllBooks`, config)
-    .then(response => {
-      this.posts = response.data.books.sort(function(a,b){
-        return new Date(b.uploadDate) - new Date(a.uploadDate);
+    let config = {
+      headers: { Authorization: "Bearer " + localStorage.getItem("user-token") }
+    };
+    axios
+      .get(`http://localhost:3003/book/getAllBooks`, config)
+      .then(response => {
+        this.posts = response.data.books.sort(function(a, b) {
+          return new Date(b.uploadDate) - new Date(a.uploadDate);
+        });
+      })
+      .catch(e => {
+        this.errors.push(e);
       });
-      console.log(this.posts)
-    })
-    .catch(e => {
-			this.errors.push(e)
-    })
   }
-}
+};
 </script>
 
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style scoped>
+section {
+  width: 100%;
+  min-height: calc(100vh - 68px);
+  background: var(--bg-color-2);
+  padding-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 5vw;
+}
+.title {
+  color: var(--foreground-color-main);
+  font-size: 24px;
+  opacity: 0.9;
+  display: block;
+  margin: 60px 0;
+}
+#library {
+  width: 90vw;
+}
 
-<style>
-  .lowMargin {
-    margin-bottom: 20px !important;
-  }
+.books {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 220px);
+  grid-gap: 50px;
+  justify-content: center;
+}
 
-  .noResult {
-    margin-top: 50px;
-    color: grey
+@media screen and (max-width: 768px) {
+  .books {
+    grid-template-columns: repeat(auto-fill, 125px);
   }
+  .title {
+    margin: 30px 0;
+  }
+}
 </style>

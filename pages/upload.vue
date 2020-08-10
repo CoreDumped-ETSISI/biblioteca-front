@@ -119,7 +119,12 @@ export default {
           );
           console.log(res);
           console.log("=======================================");
-          this.uploadImage(imageFile, res.data.message.sha1);
+          if(imageFile != undefined)
+            this.uploadImage(imageFile, res.data.message.sha1);
+          else {
+            this.changePage()
+            spinnerService.setSpinnerStatus(false);
+          }
         })
         .catch(err => {
           spinnerService.setSpinnerStatus(false);

@@ -1,7 +1,7 @@
 <template>
   <div>
-      <topnavbar :logged=true></topnavbar>
-      <catalog></catalog>
+      <topnavbar @onSearch="onSearch" :logged=true></topnavbar>
+    <catalog :search="this.search" id="catalog"></catalog>
   </div>
 </template>
 
@@ -15,6 +15,19 @@ export default {
   components: {
     catalog,
     topnavbar
+  },
+   data() {
+    return {
+      search: {
+        query: '',
+        params: []
+      }
+    }
+  },
+  methods: {
+    onSearch(data) {
+      this.search = data; 
+    }
   }
 }
 </script>
