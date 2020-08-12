@@ -104,6 +104,11 @@ export default {
           console.log("error");
         });
     },
+     changePage() {
+      this.$router.push({
+        path: "/bookManagement"
+      });
+    },
     erase() {
       const url = `http://localhost:3003/book/` + this.book._id;
       const localthis = this
@@ -113,7 +118,7 @@ export default {
       })
         .then(response => {
           console.log(response);
-          localthis.location.reload()
+          localthis.changePage()
           return false
         })
         .catch(err => {

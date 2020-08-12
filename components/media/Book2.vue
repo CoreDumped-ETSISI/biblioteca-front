@@ -122,11 +122,34 @@ export default {
           ); //or any other extension
           document.body.appendChild(link);
           link.click();
+          this.saveDownload()
         })
         .catch(err => {
           console.log(err);
           console.log("FAILURE!!");
         });
+    },
+
+    saveDownload() {
+ axios
+      .get(`http://localhost:3003/user/getByName/`+localStorage.getItem("user-name"))
+      .then(response => {
+          console.log(response.data)
+          const myid = response.data.user[0]._id;
+         axios
+        .post("http://localhost:3003/download", {
+          downloader: myid,
+          book: this.book._id
+        })
+        .then(function(response) {
+          console.log(response.data)
+        })
+        .catch(function(err) {
+          console.log(err)
+        })})
+      .catch(e => {
+        this.errors.push(e);
+      });
     }
   }
 };

@@ -142,6 +142,12 @@
                   >
                 </div>
                 <div class="item">
+                  <a href="/recommended"
+                    ><i class="material-icons">star</i>
+                    <div class="text">Recomendaciones</div></a
+                  >
+                </div>
+                <div class="item">
                   <a href="/upload"
                     ><i class="material-icons">cloud_upload</i>
                     <div class="text">Subir libro</div></a
